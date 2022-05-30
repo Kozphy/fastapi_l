@@ -131,3 +131,6 @@ dmypy.json
 # config
 *.yaml
 token
+
+# log
+log/*
