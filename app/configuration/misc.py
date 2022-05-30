@@ -2,12 +2,13 @@ from pathlib import Path
 from loguru import logger
 
 
-def check_folder(folder) -> None:
+def check_file_parent_folder(file_path) -> None:
     ## if log folder not exists create one
+    parent_folder = file_path.parent
 
-    if not Path(folder).exists():
-        logger.info(f"Creating {folder}, which not exists")
-        Path(folder).mkdir(parents=True)
+    if not Path(parent_folder).exists():
+        logger.info(f"Creating {parent_folder} folder, if not exists")
+        Path(parent_folder).mkdir(parents=True)
     return
 
 

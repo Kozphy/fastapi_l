@@ -1,8 +1,8 @@
-# TODO: change to match api env
 from loguru import logger
-from .misc import check_folder
-from loggers import setup_logging
+from .misc import check_file_parent_folder
+from logger import setup_logging
 from typing import Any, Dict, Optional
+from enums.runmode import RunMode
 from pathlib import PurePath
 import pprint
 
@@ -17,67 +17,79 @@ class Process_options:
     @classmethod
     def from_args(cls, args: Optional[Dict[str, Any]]):
         return cls(
-            configured={},
+            configured=None,
             args=args,
             yaml=None,
         )
+        
+    # logging
+    # def _process_logging_options(self):
+    #     """
+    #     change logger level
+    #     """
+    #     logger.debug('process logging options')
+
+    # common 
+    # def _process_common(self):
+    #     logger.debug("process common options")
+    #     common = self._yaml['common']
+
+    #     self.configured.update({'common': common})
+
+    # persistence 
+    # def _process_persistece_options(self):
+    #     logger.debug("process persistence options") 
+
+    # api services
+    ##TODO: compare with cmds option
+    def _process_api_service_config(self):
+        api_service_config = self._yaml['api_service']
+        self.configured['api_service'] = {}
+        for config in api_service_config:
+            if config not in ['persistence', 'logfile']:
+                self.configured['api_service'].update({config:api_service_config[config]})
+
+        self._process_api_services_log_options()
+        self._process_api_services_persistence_options()
 
 
-    def _process_logging_options(self):
-        """
-        change logger level
-        """
-        from constants import DEFAULT_LOG_FILE_DIR
-        logger.debug('process logging options')
+    def _process_api_services_log_options(self) -> None:
+        logger.debug("process api services log options")
+        from constants import DEFAULT_API_SERVICE_LOG, API_SERVICE_LOG_VERBOSE
 
-        filename = self._args['logfile'].split('/')[-1]
+        api_service_log_config = {
+            'logfile': DEFAULT_API_SERVICE_LOG,
+            'verbose': API_SERVICE_LOG_VERBOSE,
+        }
 
-        # args and default
-        self.configured['logfile'] = f"{DEFAULT_LOG_FILE_DIR}/{filename}"
+        # yaml
+        yaml_api_service = self._yaml['api_service']
+        if yaml_api_service['logfile'] is not None:
+            api_service_log_config['logfile'] = yaml_api_service['logfile']
 
-        if 'logfile' in self._yaml and self._yaml['logfile'] is not None:
-            # yaml
-            self.configured['logfile'] = f"{DEFAULT_LOG_FILE_DIR}/{self._yaml['logfile']}"
+        # args
+        if self._args['logfile'] is not None:
+            api_service_log_config['logfile'] = self._args['logfile']
 
-        check_folder(DEFAULT_LOG_FILE_DIR)
-            
-        setup_logging(self._args)
+        self.configured['api_service'].update(api_service_log_config)
 
-    def _process_common(self):
-        logger.debug("process common options")
-        common = self._yaml['common']
+        api_service_config = self.configured['api_service']
 
-        self.configured.update({'common': common})
+        logger.debug(f"api service logfile in {api_service_config['logfile']}")
+        check_file_parent_folder(api_service_config['logfile'])
 
-     
-    def _process_persistece_options(self):
-            logger.debug("process persistence options") 
+        # setting logfiles
+        setup_logging(self.configured, self._args['mode'].name)
 
-            from constants import (DEFAULT_DB_HOST, DEFAULT_DB_PORT, DEFAULT_DB_USER,
-            DEFAULT_USERDATA_DIR, DEFAULT_DB_DIR, DEFAULT_DB_NAME)
-            config_persistence = self._yaml['persistence']
 
-            # default and args
-            persistence = {
-                **config_persistence,
-            }
-            if self._args is not None:
-                # args
-                if self._args['db_path'] != DEFAULT_DB_DIR:
-                    #TODO: implement USERDATA_DIR and purePath
-                    persistence['path'] = self._args['db_path']
-                    # logger.debug(f"db_path: {self._args['db_path']}")
-                
-                if self._args['db_name'] != DEFAULT_DB_NAME:
-                    persistence['db_name'] = self._args['db_name']
-                
-                if self._args['db_user'] != DEFAULT_DB_USER:
-                    persistence['user'] = self._args['db_user']
-                
-                if self._args['db_port'] != DEFAULT_DB_PORT:
-                    persistence['port'] = self._args['db_port']
-                
-                if self._args['db_host'] != DEFAULT_DB_HOST:
-                    persistence['host'] = self._args['db_host']
 
-            self.configured.update({"persistence":persistence})
+
+    def _process_api_services_persistence_options(self):
+        logger.debug("process api services persistence options")
+        yaml_api_service = self._yaml['api_service']
+
+        api_service_persistence = {
+            **yaml_api_service['persistence'],
+        }
+
+        self.configured['api_service'].update({"persistence":api_service_persistence})
