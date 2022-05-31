@@ -41,16 +41,29 @@ class Process_options:
     #     logger.debug("process persistence options") 
 
     # api services
+        
     ##TODO: compare with cmds option
     def _process_api_service_config(self):
         api_service_config = self._yaml['api_service']
+        if self._args['mode'] == RunMode.UVICORN:
+            self._process_uvicorn_config(api_service_config)
+            return
+
         self.configured['api_service'] = {}
         for config in api_service_config:
-            if config not in ['persistence', 'logfile']:
+            if config not in ['uvicorn', 'persistence', 'logfile']:
                 self.configured['api_service'].update({config:api_service_config[config]})
 
         self._process_api_services_log_options()
         self._process_api_services_persistence_options()
+    
+    def _process_uvicorn_config(self, api_service_config):
+        logger.debug("process uvicorn config")
+
+        uvicorn_config = {
+            **api_service_config['uvicorn'],
+        }
+        self.configured.update({"uvicorn":uvicorn_config})
 
 
     def _process_api_services_log_options(self) -> None:
@@ -63,23 +76,38 @@ class Process_options:
         }
 
         # yaml
-        yaml_api_service = self._yaml['api_service']
+        """
+        equal following and so on
         if yaml_api_service['logfile'] is not None:
             api_service_log_config['logfile'] = yaml_api_service['logfile']
-
+        """
+        yaml_api_service = self._yaml['api_service']
+        for config in yaml_api_service:
+            if config in api_service_log_config.keys():
+                if yaml_api_service[config] is not None:
+                    api_service_log_config[config] = yaml_api_service[config]
+                
         # args
+        """
+        equal following and so on 
         if self._args['logfile'] is not None:
             api_service_log_config['logfile'] = self._args['logfile']
+        """
+        for arg in self._args:
+            if arg in api_service_log_config.keys():
+                if self._args[arg] is not None:
+                    api_service_log_config[arg] = self._args[arg]
 
         self.configured['api_service'].update(api_service_log_config)
 
         api_service_config = self.configured['api_service']
 
-        logger.debug(f"api service logfile in {api_service_config['logfile']}")
+        # check logfile parent folder whether exist
         check_file_parent_folder(api_service_config['logfile'])
 
         # setting logfiles
         setup_logging(self.configured, self._args['mode'].name)
+        logger.debug(f"api service logfile in {api_service_config['logfile']}")
 
 
 

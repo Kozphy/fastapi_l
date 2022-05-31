@@ -1,9 +1,32 @@
-from fastapi import Body, FastAPI, HTTPException, Response, status
+from functools import lru_cache
+from fastapi import (FastAPI, HTTPException,
+Depends, Response, status)
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 
+from persistences.alembic_migrations import migration_upgrade
+from persistences.sqlalchemy_engine import init_db_engine
+from configuration.api_service_config.config_fastapi import Settings
+from loguru import logger
+
+@lru_cache()
+def get_settings():
+    return Settings.from_config().api_service_config['api_service']
+
 app = FastAPI()
+settings = get_settings()
+
+migration_upgrade(settings['persistence'])
+
+# Dependency
+def get_db():
+    db = init_db_engine(settings['persistence'])
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 class Post(BaseModel):
     title: str
@@ -25,6 +48,7 @@ my_posts = [
 
 @app.get("/")
 async def root():
+    print(settings)
     return {"message": "Hello World"}
 
 @app.get("/posts")

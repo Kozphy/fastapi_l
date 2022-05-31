@@ -1,7 +1,6 @@
 from loguru import logger
 import sys
 from typing import Any, Dict, Optional
-import copy
 # import os
 LOGFORMAT = '{time:YYYY-MM-DD HH:mm:ss,SSS} - {name} - {level} - {message}'
 # LOGFORMATED = Formatter(LOGFORMAT)
@@ -42,7 +41,6 @@ def setup_logging(config: Optional[Dict[str, Any]], mode) -> None:
     if logfile:
         logger.add(logfile, level=log_level, format=LOGFORMAT,
          rotation='10MB')
-    
 
     logger.info(f'{mode} Verbosity set to {verbose}')
 

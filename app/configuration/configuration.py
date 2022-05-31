@@ -1,4 +1,3 @@
-# TODO: change to match api env
 from loguru import logger
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -53,7 +52,8 @@ class Configuration:
 
         logger.debug('merge config and yaml')
         self.process.configured = {}
-        if self.process._args['mode'] == RunMode.API_SERVICE:
+        if (self.process._args['mode'] == RunMode.API_SERVICE or 
+         self.process._args['mode'] == RunMode.UVICORN):
             self.process._process_api_service_config()
         # self.process._process_logging_options()
         # self.process._process_common()
