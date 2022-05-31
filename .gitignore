@@ -133,5 +133,6 @@ dmypy.json
 token
 
 # log
-log/*
-app/log
+app/log/*
+
+bfg-**
