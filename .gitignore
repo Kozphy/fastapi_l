@@ -134,3 +134,4 @@ token
 
 # log
 log/*
+app/log
