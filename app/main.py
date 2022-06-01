@@ -75,7 +75,8 @@ def create_posts(post: Post, db: Transaction = Depends(get_db)):
          Post_table.c.published,
      )
     # TODO: fix returning maximum recursive issue
-    db.execute(stmt)
+    p = db.execute(stmt).all()
+    print(p)
     # for p in new_posts:
     #     print(p)
 
@@ -85,7 +86,7 @@ def create_posts(post: Post, db: Transaction = Depends(get_db)):
     # post_dict = post.dict()
     # post_dict['id'] = randrange(0, 100000)
     # my_posts.append(post_dict)
-    # return {"data": post_dict}
+    return {"data": p}
 
 def find_post(id):
     for p in my_posts:
