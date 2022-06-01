@@ -1,31 +1,18 @@
-from functools import lru_cache
 from fastapi import (FastAPI, HTTPException,
 Depends, Response, status)
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 
-from persistences.alembic_migrations import migration_upgrade
-from persistences.sqlalchemy_engine import init_db_engine
-from configuration.api_service_config.config_fastapi import Settings
+from sqlalchemy import text, select, literal_column, insert
+from sqlalchemy.engine import Transaction
+from persistences.fastapi_dependency.db import get_db
+from persistences.postgresql.modules.posts import Post_table
+from configuration.api_service_config.config_fastapi import settings
 from loguru import logger
 
-@lru_cache()
-def get_settings():
-    return Settings.from_config().api_service_config['api_service']
-
 app = FastAPI()
-settings = get_settings()
 
-migration_upgrade(settings['persistence'])
-
-# Dependency
-def get_db():
-    db = init_db_engine(settings['persistence'])
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 class Post(BaseModel):
@@ -51,16 +38,54 @@ async def root():
     print(settings)
     return {"message": "Hello World"}
 
-@app.get("/posts")
-def get_posts():
-    return{"data": my_posts}
+@app.get("/posts" )
+def get_posts(db: Transaction = Depends(get_db)):
+    # posts = db.execute(text("""SELECT * FROM posts""")).all()
+
+    stmt = (
+        select(
+            Post_table
+        )
+    )
+
+    posts = []
+    posts_content = db.execute(stmt).all()
+    for post in posts_content:
+        posts.append(
+            {
+                'id': post[0],
+                'title': post[1],
+                'content': post[2],
+                'published': post[3],
+                'create_at': post[4],
+            }
+        )
+        
+    return {"data": posts}
+
+
+    
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post):
-    post_dict = post.dict()
-    post_dict['id'] = randrange(0, 100000)
-    my_posts.append(post_dict)
-    return {"data": post_dict}
+def create_posts(post: Post, db: Transaction = Depends(get_db)):
+    stmt = insert(Post_table).values(title=post.title, content=post.content,
+     published=post.published).returning(
+         Post_table.c.title,
+         Post_table.c.content,
+         Post_table.c.published,
+     )
+    # TODO: fix returning maximum recursive issue
+    db.execute(stmt)
+    # for p in new_posts:
+    #     print(p)
+
+
+
+    # return {"data": new_posts}
+    # post_dict = post.dict()
+    # post_dict['id'] = randrange(0, 100000)
+    # my_posts.append(post_dict)
+    # return {"data": post_dict}
 
 def find_post(id):
     for p in my_posts:
@@ -109,3 +134,13 @@ def update_post(id: int, post: Post):
     post_dict['id'] = id
     my_posts[index] = post_dict
     return {'data': post_dict}
+
+# @app.get("/sqlalchemy")
+# def test_posts(db: Transaction = Depends(get_db)):
+#     stmt = select(text("'id'"), Post_table.c.id)
+#     print(stmt)
+#     result = []
+#     for row in db.execute(stmt):
+#         result.append(row)
+#     print(result)
+    # return {"data", result} 

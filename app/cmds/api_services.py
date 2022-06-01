@@ -3,6 +3,8 @@ import click
 from logger import setup_logging_pre
 from pathlib import Path
 from configuration.configuration import Configuration
+from persistences.alembic_migrations import (migration_autogenerate, migration_downgrade,
+migration_upgrade)
 from enums.runmode import RunMode
 from pprint import pprint
 
@@ -39,3 +41,38 @@ def active(ctx, reload):
 
 
     uvicorn.run('main:app', reload=reload, **setting)
+
+@cli.command()
+@click.option('-m', '--message', type=str, default='test')
+def alembic_autogenerate(message):
+    args = {
+        'mode': RunMode.API_SERVICE,
+    }
+    c = Configuration.from_options(args).get_config()['api_service']['persistence']
+
+    migration_autogenerate(c, message)
+    
+
+@cli.command()
+@click.option('--revision', type=str, default='head')
+@click.option('--sql', type=bool, default=False)
+@click.option('--tag', type=bool, default=None)
+def alembic_upgrade(revision, sql, tag):
+    args = {
+        'mode': RunMode.API_SERVICE,
+    }
+    c = Configuration.from_options(args).get_config()['api_service']['persistence']
+
+    migration_upgrade(c, revision, sql, tag)
+
+@cli.command()
+@click.option('--revision', type=str, default='base')
+@click.option('--sql', type=bool, default=False)
+@click.option('--tag', type=bool, default=None)
+def alembic_downgrade(revision, sql, tag):
+    args = {
+        'mode': RunMode.API_SERVICE,
+    }
+    c = Configuration.from_options(args).get_config()['api_service']['persistence']
+
+    migration_downgrade(c, revision, sql, tag)
