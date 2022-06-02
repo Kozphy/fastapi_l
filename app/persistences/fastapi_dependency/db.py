@@ -11,5 +11,5 @@ def get_db():
     except Exception as e:
         logger.error(f'{e}')
         raise
-    finally:
-        conn.close()
+    # finally:
+    #     conn.close()
