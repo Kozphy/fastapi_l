@@ -9,6 +9,7 @@ from alembic import context
 
 # target metadata
 from persistences.postgresql.modules.posts import post_meta
+from persistences.postgresql.modules.users import user_meta
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +24,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [post_meta]
+target_metadata = [post_meta, user_meta]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
