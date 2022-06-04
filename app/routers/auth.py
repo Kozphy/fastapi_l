@@ -11,12 +11,12 @@ from persistences.utils import verify, hash
 from sqlalchemy.engine import Transaction
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
-from routers.validation.fast_api_pydantic.user import User_login
+from routers.validation.fast_api_pydantic.auth import Token
 from routers.validation.auth.oauth2 import create_access_token
 
 router = APIRouter(tags=['Authentication'])
 
-@router.post("/login", status_code=status.HTTP_200_OK)
+@router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
 def login(user_cridentials: OAuth2PasswordRequestForm = Depends() ,db: Transaction = Depends(get_db)):
 
     check_email_stmt = select(User_table).where(User_table.c.email == user_cridentials.username)

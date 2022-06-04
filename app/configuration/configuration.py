@@ -50,7 +50,7 @@ class Configuration:
         While cmd permission bigger than another one, override smaller one.
         """
 
-        logger.debug('merge config and yaml')
+        logger.debug('merge args and yaml')
         self.process.configured = {}
         if (self.process._args['mode'] == RunMode.API_SERVICE or 
          self.process._args['mode'] == RunMode.UVICORN):

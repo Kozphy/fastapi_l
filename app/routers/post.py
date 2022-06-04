@@ -10,6 +10,7 @@ from sqlalchemy import text, select, literal_column, insert, delete, update
 from sqlalchemy.engine import Transaction
 
 from routers.validation.fast_api_pydantic.post import Post_create, Post_update, Post_response
+from routers.validation.auth import oauth2
 
 router = APIRouter(
     prefix="/posts",
@@ -17,7 +18,7 @@ router = APIRouter(
 )
 
 @router.get("/" ,response_model=List[Post_response])
-def get_posts(db: Transaction = Depends(get_db)):
+def get_posts(current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
     # posts = db.execute(text("""SELECT * FROM posts""")).all()
 
     stmt = (
@@ -46,11 +47,12 @@ def get_posts(db: Transaction = Depends(get_db)):
     
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post_response)
-def create_posts(post: Post_create, db: Transaction = Depends(get_db)):
+def create_posts(post: Post_create, current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
     # stmt_1 = text("""INSERT INTO posts (title, content, published) VALUES (
     #     :title, :content, :published) returning * """
     # )
     # p = db.execute(stmt_1, [{'title': post.title, 'content': post.content, 'published': post.published}]).all()
+    print(current_user)
 
     stmt_2 = insert(Post_table).values(title=post.title, content=post.content,
      published=post.published).returning(
@@ -63,7 +65,7 @@ def create_posts(post: Post_create, db: Transaction = Depends(get_db)):
     p = db.execute(stmt_3)
 
     all_posts = p.all()
-    print(all_posts)
+    # print(all_posts)
 
     return all_posts[0]
 
@@ -76,7 +78,7 @@ def get_post(id: int, response: Response, db: Transaction = Depends(get_db)):
 
     stmt_2 = select(Post_table).where(Post_table.c.id == id)
     p = db.execute(stmt_2).first()
-    print(p)
+    # print(p)
 
     post_title = ['id', 'title', 'content', 'published', 'create_at']
     result = {}
@@ -91,14 +93,12 @@ def get_post(id: int, response: Response, db: Transaction = Depends(get_db)):
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Transaction = Depends(get_db)):
-    # deleting post
-    # find the index in the aarray that has required ID 
-    # my_posts.pop(i)
+def delete_post(id: int, current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
+ 
     
     stmt = select(Post_table).where(Post_table.c.id == id)
     p = db.execute(stmt).first()
-    print(p)
+    # print(p)
 
     if p == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
@@ -110,7 +110,7 @@ def delete_post(id: int, db: Transaction = Depends(get_db)):
    
 
 @router.put("/{id}", status_code=status.HTTP_200_OK, response_model=Post_response )
-def update_post(id: int, post: Post_update, db: Transaction = Depends(get_db)):
+def update_post(id: int, post: Post_update, current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
 
     stmt = select(Post_table).where(Post_table.c.id == id)
     p = db.execute(stmt).first()
@@ -122,7 +122,7 @@ def update_post(id: int, post: Post_update, db: Transaction = Depends(get_db)):
     returning(Post_table)
 
     update_data=db.execute(update_stmt).first()
-    print(update_data)
+    # print(update_data)
 
 
     return update_data
