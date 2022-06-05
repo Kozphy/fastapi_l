@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
-def create_users(user: User_create, current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
+def create_users(user: User_create, db: Transaction = Depends(get_db)):
 
     stmt_check = select(User_table).where(User_table.c.email == user.email)
     check_email = db.execute(stmt_check).first()

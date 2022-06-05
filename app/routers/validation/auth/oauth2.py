@@ -58,7 +58,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Transaction = Depe
     detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     token_data = verify_access_token(token, credentials_exception)
     logger.debug(f'token_data: {token_data}')
+    # check access token id whether in database
     stmt = select(User_table).where(User_table.c.id == token_data.id)
     user = db.execute(stmt).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"credentials is invalid")
 
     return user
