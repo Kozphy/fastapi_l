@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, parse_obj_as
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from .user import User_response
 
@@ -8,10 +8,11 @@ class Post_base(BaseModel):
     title: str
     content: str
     published: bool = True
+    owner_id : Union[int, None] = None
 
 ## validate request 
-class Post_create(BaseModel):
-    data: List[Dict[Post_base]]
+class Post_create(Post_base):
+    pass
 
 
 class Post_update(Post_base):

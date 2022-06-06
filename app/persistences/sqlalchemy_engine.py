@@ -1,5 +1,6 @@
 from loguru import logger
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from pprint import pprint
 
@@ -34,7 +35,7 @@ def init_db_url(db, user, password, host, db_name, port, charset="utf8mb4",
 
     return db_url
 
-def init_db_engine(configured: Dict[str, Any], echo=True, future=True) -> None:
+def init_db_engine(configured: Dict[str, Any], echo=True, future=True) -> Engine:
         """Initialize the database engine"""
 
         # pprint(configured)

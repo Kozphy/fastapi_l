@@ -10,7 +10,8 @@ from persistences.postgresql.modules.users import User_table
 from persistences.fastapi_dependency.db import get_db
 
 from sqlalchemy import select, literal_column, insert, delete, update
-from sqlalchemy.engine import Transaction
+from sqlalchemy.engine import Connection, CursorResult
+
 
 from routers.validation.fast_api_pydantic.auth import TokenData
 
@@ -53,16 +54,17 @@ def verify_access_token(token: str, credentials_exception):
 
     return token_data
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Transaction = Depends(get_db)):
+def get_current_user(access_token: str = Depends(oauth2_scheme), db: Connection = Depends(get_db)) -> CursorResult:
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
     detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-    token_data = verify_access_token(token, credentials_exception)
+
+    token_data = verify_access_token(access_token, credentials_exception)
     logger.debug(f'token_data: {token_data}')
     # check access token id whether in database
     stmt = select(User_table).where(User_table.c.id == token_data.id)
     user = db.execute(stmt).first()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"credentials is invalid")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"token credentials is invalid")
 
     return user

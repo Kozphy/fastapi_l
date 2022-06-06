@@ -1,7 +1,7 @@
 from fastapi import (HTTPException,
 Depends, Response, status, APIRouter)
 
-from sqlalchemy.engine import Transaction
+from sqlalchemy.engine import Connection, CursorResult
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
 from persistences.postgresql.modules.users import User_table
@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
-def create_users(user: User_create, db: Transaction = Depends(get_db)):
+def create_users(user: User_create, db: Connection = Depends(get_db)):
 
     stmt_check = select(User_table).where(User_table.c.email == user.email)
     check_email = db.execute(stmt_check).first()
@@ -42,9 +42,14 @@ def create_users(user: User_create, db: Transaction = Depends(get_db)):
     return res 
 
 @router.get("/{id}", response_model=User_response)
-def get_user(id: int, current_user: int= Depends(oauth2.get_current_user), db: Transaction = Depends(get_db)):
+def get_user(id: int, current_user_data: CursorResult= Depends(oauth2.get_current_user), db: Connection = Depends(get_db)):
 
-    stmt = select(User_table).where(User_table.c.id == id)
+    current_user_id = current_user_data[0]
+
+    stmt = select(User_table).where(
+        User_table.c.id == id,
+        User_table.c.id == current_user_id
+    )
 
     user = db.execute(stmt).first()
     
