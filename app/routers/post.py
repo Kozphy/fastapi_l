@@ -1,7 +1,7 @@
 from fastapi import (HTTPException,
 Depends, Response, status, APIRouter)
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 from loguru import logger
 
 from persistences.fastapi_dependency.db import get_db
@@ -10,7 +10,7 @@ from persistences.postgresql.modules.users import User_table
 
 
 from sqlalchemy import (text, select, literal_column, insert, delete, update,
-Table, MetaData)
+Table, MetaData, and_, or_)
 from sqlalchemy.engine import CursorResult, Connection
 
 from routers.validation.fast_api_pydantic.post import Post_create, Post_update, Post_response
@@ -47,21 +47,31 @@ def create_posts(posts: List[Post_create], current_user_data: CursorResult= Depe
 
 @router.get("/" ,response_model=List[Post_response])
 def get_posts(current_user_data: CursorResult= Depends(oauth2.get_current_user), db: Connection = Depends(get_db), 
-    limit: int = 10):
+    limit: int = 10, skip: int = 0, precisely_search: Optional[str] = "", ambiguous_search: Optional[str]= None):
     logger.debug('get posts')
-    logger.debug(f'limit is {limit}')
     # posts = db.execute(text("""SELECT * FROM posts""")).all()
     # print(f'current_user {current_user}')
     current_user_id = current_user_data[0]
 
+    # if both of following are True trigger ambiguously_search to search all content
+    if precisely_search == "" and ambiguous_search is None:
+        ambiguous_search = ""
+
     stmt_select_all = (
         select(
             Post_table
-        ).where(Post_table.c.owner_id == current_user_id)
+        ).limit(limit).offset(skip).where(
+            Post_table.c.owner_id == current_user_id,
+                or_(
+                    Post_table.c.title == precisely_search,
+                    Post_table.c.title.like(f'%{ambiguous_search}%')
+                )
+        )
     )
+    
 
     posts = []
-    data = db.execute(stmt_select_all).fetchmany(limit)
+    data = db.execute(stmt_select_all).all()
     for post in data:
         # data is considered to be nametuple
         posts.append(Post_response(**post, owner=current_user_data))
