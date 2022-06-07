@@ -6,7 +6,7 @@ from loguru import logger
 from fastapi import (Depends, status, HTTPException)
 from fastapi.security import OAuth2PasswordBearer
 
-from persistences.postgresql.modules.users import User_table
+from persistences.postgresql.modules.users import users_table
 from persistences.fastapi_dependency.db import get_db
 
 from sqlalchemy import select, literal_column, insert, delete, update
@@ -26,7 +26,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 SECRET_KEY = settings['jwt_secret'] 
 KEY_SALT = settings['jwt_salt']
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -61,7 +61,7 @@ def get_current_user(access_token: str = Depends(oauth2_scheme), db: Connection 
     token_data = verify_access_token(access_token, credentials_exception)
     logger.debug(f'token_data: {token_data}')
     # check access token id whether in database
-    stmt = select(User_table).where(User_table.c.id == token_data.id)
+    stmt = select(users_table).where(users_table.c.id == token_data.id)
     user = db.execute(stmt).first()
 
     if not user:

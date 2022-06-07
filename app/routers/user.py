@@ -4,7 +4,7 @@ Depends, Response, status, APIRouter)
 from sqlalchemy.engine import Connection, CursorResult
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
-from persistences.postgresql.modules.users import User_table
+from persistences.postgresql.modules.users import users_table
 from persistences import utils
 from persistences.fastapi_dependency.db import get_db
 
@@ -19,7 +19,7 @@ router = APIRouter(
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
 def create_users(user: User_create, db: Connection = Depends(get_db)):
 
-    stmt_check = select(User_table).where(User_table.c.email == user.email)
+    stmt_check = select(users_table).where(users_table.c.email == user.email)
     check_email = db.execute(stmt_check).first()
     if check_email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{user.email} email already exists")
@@ -30,7 +30,7 @@ def create_users(user: User_create, db: Connection = Depends(get_db)):
 
     new_user = user.dict()
     # print(new_user)
-    stmt = insert(User_table).values(**new_user).returning(User_table)
+    stmt = insert(users_table).values(**new_user).returning(users_table)
 
     result = db.execute(stmt).first()
     user_title = ['id', 'email', 'password', 'created_at']
@@ -46,9 +46,9 @@ def get_user(id: int, current_user_data: CursorResult= Depends(oauth2.get_curren
 
     current_user_id = current_user_data[0]
 
-    stmt = select(User_table).where(
-        User_table.c.id == id,
-        User_table.c.id == current_user_id
+    stmt = select(users_table).where(
+        users_table.c.id == id,
+        users_table.c.id == current_user_id
     )
 
     user = db.execute(stmt).first()

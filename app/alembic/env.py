@@ -8,8 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # target metadata
-from persistences.postgresql.modules.users import user_meta
-from persistences.postgresql.modules.posts import post_meta
+from persistences.postgresql.modules.users import users_meta
+from persistences.postgresql.modules.posts import posts_meta
+from app.persistences.postgresql.modules.votes import votes_meta
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,7 +26,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [user_meta, post_meta]
+target_metadata = [users_meta, posts_meta, votes_meta]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
