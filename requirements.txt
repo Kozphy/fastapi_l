@@ -12,8 +12,9 @@ dnspython==2.2.1
 ecdsa==0.17.0
 email-validator==1.2.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api@bb27b73a8986fd762ead245bb21dea898c776a4d#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api@91647665a27240605422bd9ecaf32a5f69c50854#egg=fastapi_learn
 greenlet==1.1.2
+gunicorn==20.1.0
 h11==0.13.0
 httptools==0.4.0
 idna==3.3

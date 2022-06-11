@@ -5,6 +5,7 @@ from enums.runmode import RunMode
 
 from functools import lru_cache
 
+# TODO: fix deployment to heroku env setting error
 class Settings(BaseSettings):
     api_service_config: Dict[str, Any]
 

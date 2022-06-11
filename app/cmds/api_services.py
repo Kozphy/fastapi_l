@@ -29,7 +29,7 @@ def cli(ctx, logfile, verbose, config):
 
 @cli.command()
 @click.pass_context
-@click.option('--reload', type=bool, default=True)
+@click.option('--reload', type=bool, default=False)
 def active(ctx, reload):
     c = Configuration.from_options(ctx.obj).get_config()['uvicorn']
 
@@ -37,6 +37,7 @@ def active(ctx, reload):
         'host': c['host'],
         'port': int(c['port']),
         'log_level': c['log_level'],
+        'workers': c['workers']
     }
 
 

@@ -136,3 +136,9 @@ token
 app/log/*
 
 bfg-**
+
+# service
+*.service
+
+# nginx
+nginx
