@@ -127,3 +127,23 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+<<<<<<< HEAD
+=======
+
+# config
+*.yaml
+token
+
+# log
+app/log/*
+
+bfg-**
+
+# service
+*.service
+
+# nginx
+nginx
+
+.lh
+>>>>>>> master
