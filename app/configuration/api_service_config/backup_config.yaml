@@ -1,0 +1,23 @@
+common:
+
+api_service:
+  # create_log_dir: True
+  # logfile: "record.txt"
+  jwt_secret: abc
+  jwt_salt: 123
+
+  uvicorn:
+    host: "127.0.0.1"
+    port: "8000"
+    log_level: debug
+    verbose: 1
+    workers: 1
+
+  persistence:
+    ORM: sqlalchemy
+    db: postgresql 
+    user: xxxx
+    password: "123557"
+    host: "127.0.0.1"
+    db_name: fdksuirew
+    port: "5432"

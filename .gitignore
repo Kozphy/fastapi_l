@@ -130,6 +130,7 @@ dmypy.json
 
 # config
 *.yaml
+!backup_*.yaml
 token
 
 # log
