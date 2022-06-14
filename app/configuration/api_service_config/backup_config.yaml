@@ -5,12 +5,12 @@ api_service:
   # logfile: "record.txt"
   jwt_secret: abc
   jwt_salt: 123
+  verbose: 1
 
   uvicorn:
-    host: "127.0.0.1"
+    host: "0.0.0.0"
     port: "8000"
     log_level: debug
-    verbose: 1
     workers: 1
 
   persistence:
@@ -21,3 +21,4 @@ api_service:
     host: "127.0.0.1"
     db_name: fdksuirew
     port: "5432"
+    ssl: False

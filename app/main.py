@@ -15,6 +15,7 @@ origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
     "http://localhost",
+    "http://localhost:8000",
     "http://localhost:8080",
 ]
 
@@ -34,7 +35,7 @@ app.include_router(vote.router)
 # home
 @app.get("/")
 async def root():
-    # print(settings)
+    print(settings)
     return {"message": "Hello World"}
 
     

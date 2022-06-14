@@ -13,12 +13,11 @@ from routers.validation.auth import oauth2
 
 router = APIRouter(
     prefix="/users",
-    tags=['Users']
+    tags=['Users'],
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
 def create_users(user: User_create, db: Connection = Depends(get_db)):
-
     stmt_check = select(users_table).where(users_table.c.email == user.email)
     check_email = db.execute(stmt_check).first()
     if check_email:

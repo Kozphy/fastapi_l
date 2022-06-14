@@ -1,9 +1,13 @@
 FROM python:3.10
 
-WORKDIR /workspace
+WORKDIR /src
 
 COPY requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# RUN pip install --editable .
+COPY . .
+
+RUN pip install --editable .
+
+CMD [ "api_service", "active" ]

@@ -31,30 +31,29 @@ def init_db_url(db, user, password, host, db_name, port, charset="utf8mb4",
     elif db == 'POSTGRESQL':
         db_url = f"{support_databases[db]}{user}:{password}@{host}:{port}/{db_name}"
 
-    
 
     return db_url
 
 def init_db_engine(configured: Dict[str, Any], echo=True, future=True) -> Engine:
         """Initialize the database engine"""
-
-        # pprint(configured)
-
-        ssl = configured['ssl']
-        db_args = {
-            'db': configured['db'].upper(),
-            'user': configured['user'],
-            'password': configured['password'],
-            'host': configured['host'],
-            'db_name': configured['db_name'],
-            'port': configured['port'],
-        }
+        logger.info("init db engine")
 
         try:
+            ssl = configured['ssl'] if 'ssl' in configured else None
+
+            db_args = {
+                'db': configured['db'].upper(),
+                'user': configured['user'],
+                'password': configured['password'],
+                'host': configured['host'],
+                'db_name': configured['db_name'],
+                'port': configured['port'],
+            }
+
             db_url = init_db_url(**db_args)
             logger.debug(f"db url is {db_url}")
 
-            if db_args['db'] not in support_ssl or ssl == False:
+            if db_args['db'] not in support_ssl or not ssl:
                 engine = create_engine(db_url, echo=echo, future=future)
                 return engine, db_url, db_args['db_name']
 
