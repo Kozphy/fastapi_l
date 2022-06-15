@@ -1,11 +1,28 @@
 version: '3'
 services:
-  api:
+  api:  
+    container_name: fastapi_prod
     build:
       context: .
       dockerfile: Dockerfile
 
     ports: 
       - "8000:8000"
+    depends_on:
+      - postgresdb
 
+  postgresdb:
+    container_name: postgresdb
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fastapi
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+      # - postgresql_config:/etc/postgresql/postgresql.conf
 
+volumes:
+  postgresql:

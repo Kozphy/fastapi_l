@@ -17,6 +17,7 @@ ROOT_LOG_DIR_NAME = 'log'
 ROOT_LOG_NAME = 'app.txt'
 DEFAULT_ROOT_LOG_DIR = Path(ROOT_DIR, ROOT_LOG_DIR_NAME)
 DEFAULT_ROOT_LOG = Path(DEFAULT_ROOT_LOG_DIR, ROOT_LOG_NAME)
+
 ## service log
 ROOT_API_SERVICE_LOG_DIR_NAME = 'api_service_log'
 API_SERVICE_LOG_NAME = 'api_service_log.txt'
@@ -35,3 +36,9 @@ ROOT_PERSISTENCE_DIR_NAME = 'persistences'
 # DEFAULT_DB_DIR_NAME = 'db'
 # DEFAULT_DB_NAME = 'test'
 # DEFAULT_DB_PORT = 8080
+
+# robot test framework
+ROOT_TEST_DIR_NAME = 'robot_test'
+ROOT_TEST_DIR = Path(ROOT_DIR, ROOT_TEST_DIR_NAME)
+SUT_NAME = "sut"
+SUT_PATH = Path(ROOT_TEST_DIR, SUT_NAME)

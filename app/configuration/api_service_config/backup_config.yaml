@@ -18,7 +18,7 @@ api_service:
     db: postgresql 
     user: xxxx
     password: "123557"
-    host: "127.0.0.1"
+    host: "host.docker.internal"
     db_name: fdksuirew
     port: "5432"
     ssl: False

@@ -2,6 +2,9 @@ version: '3'
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
   api:
+    # depends_on:
+    #   - postgresdb
+    container_name: fastapi_dev_demo
     # If you want add a non-root user to your Dockerfile, you can use the "remoteUser"
     # property in devcontainer.json to cause VS Code its sub-processes (terminals, tasks, 
     # debugging) to execute as the user. Uncomment the next line if you want the entire 
@@ -40,3 +43,18 @@ services:
     # Overrides default command so things don't shut down after the process ends.
     command: /bin/sh -c "while sleep 1000; do :; done"
  
+  # postgresdb:
+  #   container_name: postgresdb
+  #   image: postgres
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: fastapi
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - postgresql:/var/lib/postgresql/data
+      # - postgresql_config:/etc/postgresql/postgresql.conf
+
+# volumes:
+#   postgresql:
