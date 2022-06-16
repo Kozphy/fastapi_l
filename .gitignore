@@ -145,3 +145,8 @@ bfg-**
 nginx
 
 .lh
+
+# robot framework
+log.html
+report.html
+output.xml

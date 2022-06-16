@@ -2,7 +2,7 @@
 
 *** Settings ***
 Documentation   A test suite for login
-Library         lib/LoginLibrary
+Library         lib/LoginLibrary.py
 
 *** Variable ***
 ${EMAIL}        test@gmail.com
@@ -11,10 +11,10 @@ ${PASSWORD}     123456
 
 *** Test Cases ***
 User create account
-    Create  Valid User  ${EMAIL}  ${PASSWORD}
-    Status should Be    Success
+    Create user  Valid User  ${EMAIL}  ${PASSWORD}
+    Status should be    Success
 
 User Login
     Input   email       ${EMAIL} 
     Input   password    ${PASSWORD}
-    Status should Be   Logged In
+    Status should be   Logged In
