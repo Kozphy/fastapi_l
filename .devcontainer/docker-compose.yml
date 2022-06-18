@@ -1,10 +1,14 @@
-version: '3'
+version: '3.9'
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
   api:
     # depends_on:
     #   - postgresdb
     container_name: fastapi_dev_demo
+    networks:
+      - api_network
+      
+      
     # If you want add a non-root user to your Dockerfile, you can use the "remoteUser"
     # property in devcontainer.json to cause VS Code its sub-processes (terminals, tasks, 
     # debugging) to execute as the user. Uncomment the next line if you want the entire 
@@ -24,7 +28,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
 
     ports: 
-      - "8000:8000"
+      - "8080:8080"
 
 
     volumes:
@@ -46,6 +50,10 @@ services:
   firefox:
     image: selenium/node-firefox:4.2.2-20220609
     container_name: selenium-node-firefox
+    networks:
+      - api_network
+
+      
     shm_size: 2gb
     depends_on:
       - selenium-hub
@@ -57,11 +65,19 @@ services:
   selenium-hub:
     image: selenium/hub:4.2.2-20220609
     container_name: selenium-hub
+
+    networks:
+      - api_network
+
     ports:
       - "4442:4442"
       - "4443:4443"
       - "4444:4444"
-    
+
+networks:
+  api_network:
+    name: api_network
+    driver: bridge
  
   # postgresdb:
   #   container_name: postgresdb

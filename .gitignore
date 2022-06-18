@@ -127,10 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+<<<<<<< HEAD
+=======
 
 # config
 *.yaml
-!backup_*.yaml
 token
 
 # log
@@ -148,5 +149,24 @@ nginx
 
 # robot framework
 log.html
-report.html
 output.xml
+report.html
+>>>>>>> master
+
+output/
+venv/
+temp/
+.rpa/
+.idea/
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+.virtual_documents/
+*/.virtual_documents/*
+.vscode
+.DS_Store
+*.pyc
+*.zip
+*/work-items-out/*
+testrun/*
+.~lock*
+*.pkl

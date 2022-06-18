@@ -16,7 +16,7 @@ docutils==0.18.1
 ecdsa==0.17.0
 email-validator==1.2.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api.git@2bcd169d157f34af72cdfdbea087a54575c81e86#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api.git@6fab5c92fdfdc34244bad7563e613e8b40f185aa#egg=fastapi_learn
 greenlet==1.1.2
 gunicorn==20.1.0
 h11==0.13.0

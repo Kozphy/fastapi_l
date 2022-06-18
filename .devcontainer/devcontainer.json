@@ -34,10 +34,9 @@
 		"vscode": {
 			"extensions": [
 				"TomiTurtiainen.rf-intellisense",
-				"robocorp.robotframework-lsp",
-				"robocorp.robocorp-code",
 				"donjayamanne.python-extension-pack",
-				"TabNine.tabnine-vscode"
+				"TabNine.tabnine-vscode",
+				"ms-python.black-formatter"
 			]
 		}
 	}
