@@ -8,6 +8,7 @@ import pprint
 
 from attrs import define
 
+
 @define
 class Process_options:
     configured: Dict[str, Any]
@@ -21,7 +22,7 @@ class Process_options:
             args=args,
             yaml=None,
         )
-        
+
     # logging
     # def _process_logging_options(self):
     #     """
@@ -29,50 +30,52 @@ class Process_options:
     #     """
     #     logger.debug('process logging options')
 
-    # common 
+    # common
     # def _process_common(self):
     #     logger.debug("process common options")
     #     common = self._yaml['common']
 
     #     self.configured.update({'common': common})
 
-    # persistence 
+    # persistence
     # def _process_persistece_options(self):
-    #     logger.debug("process persistence options") 
+    #     logger.debug("process persistence options")
 
     # api services
-        
+
     ##TODO: compare with cmds option
     def _process_api_service_config(self):
-        api_service_config = self._yaml['api_service']
-        if self._args['mode'] == RunMode.UVICORN:
+        api_service_config = self._yaml["api_service"]
+        if self._args["mode"] == RunMode.UVICORN:
             self._process_uvicorn_config(api_service_config)
             return
 
-        self.configured['api_service'] = {}
+        self.configured["api_service"] = {}
         for config in api_service_config:
-            if config not in ['uvicorn', 'persistence', 'logfile']:
-                self.configured['api_service'].update({config:api_service_config[config]})
+            if config not in ["uvicorn", "persistence", "logfile", "nosql"]:
+                self.configured["api_service"].update(
+                    {config: api_service_config[config]}
+                )
 
         self._process_api_services_log_options()
         self._process_api_services_persistence_options()
-    
+        self._process_api_services_nosql_persistence_options()
+
     def _process_uvicorn_config(self, api_service_config):
         logger.debug("process uvicorn config")
 
         uvicorn_config = {
-            **api_service_config['uvicorn'],
+            **api_service_config["uvicorn"],
         }
-        self.configured.update({"uvicorn":uvicorn_config})
-
+        self.configured.update({"uvicorn": uvicorn_config})
 
     def _process_api_services_log_options(self) -> None:
         logger.debug("process api services log options")
         from constants import DEFAULT_API_SERVICE_LOG, API_SERVICE_LOG_VERBOSE
 
         api_service_log_config = {
-            'logfile': DEFAULT_API_SERVICE_LOG,
-            'verbose': API_SERVICE_LOG_VERBOSE,
+            "logfile": DEFAULT_API_SERVICE_LOG,
+            "verbose": API_SERVICE_LOG_VERBOSE,
         }
 
         # yaml
@@ -81,12 +84,12 @@ class Process_options:
         if yaml_api_service['logfile'] is not None:
             api_service_log_config['logfile'] = yaml_api_service['logfile']
         """
-        yaml_api_service = self._yaml['api_service']
+        yaml_api_service = self._yaml["api_service"]
         for config in yaml_api_service:
             if config in api_service_log_config.keys():
                 if yaml_api_service[config] is not None:
                     api_service_log_config[config] = yaml_api_service[config]
-                
+
         # args
         """
         equal following and so on 
@@ -98,26 +101,32 @@ class Process_options:
                 if self._args[arg] is not None:
                     api_service_log_config[arg] = self._args[arg]
 
-        self.configured['api_service'].update(api_service_log_config)
+        self.configured["api_service"].update(api_service_log_config)
 
-        api_service_config = self.configured['api_service']
+        api_service_config = self.configured["api_service"]
 
         # check logfile parent folder whether exist
-        check_file_parent_folder(api_service_config['logfile'])
+        check_file_parent_folder(api_service_config["logfile"])
 
         # setting logfiles
-        setup_logging(self.configured, self._args['mode'].name)
+        setup_logging(self.configured, self._args["mode"].name)
         logger.debug(f"api service logfile in {api_service_config['logfile']}")
-
-
-
 
     def _process_api_services_persistence_options(self):
         logger.debug("process api services persistence options")
-        yaml_api_service = self._yaml['api_service']
+        yaml_api_service = self._yaml["api_service"]
 
         api_service_persistence = {
-            **yaml_api_service['persistence'],
+            **yaml_api_service["persistence"],
         }
 
-        self.configured['api_service'].update({"persistence":api_service_persistence})
+        self.configured["api_service"].update({"persistence": api_service_persistence})
+
+    def _process_api_services_nosql_persistence_options(self):
+        logger.debug("process api services nosql persistence options")
+        yaml_api_service = self._yaml["api_service"]
+        support_nosql_dict = ["redis"]
+
+        api_service_nosql = {**yaml_api_service["nosql"]}
+
+        self.configured["api_service"].update({"nosql": api_service_nosql})

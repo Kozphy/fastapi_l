@@ -11,6 +11,7 @@ client = TestClient(app)
 
 def request_main(args):
     try:
+        # TDOO: fix RobotNotRunningError: Cannot access execution context
         robot_request_library = BuiltIn().get_library_instance("RequestsLibrary")
         title = robot_request_library.get_title()
         logger.console(title)
