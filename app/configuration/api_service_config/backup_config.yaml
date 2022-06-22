@@ -22,3 +22,9 @@ api_service:
     db_name: fdksuirew
     port: "5432"
     ssl: False
+
+  nosql:
+    db: redis
+    host: "dsacxz"
+    port: "1373714"
+    password: "xxxxad"
