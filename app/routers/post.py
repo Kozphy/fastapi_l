@@ -3,11 +3,9 @@ from fastapi import HTTPException, Depends, Response, status, APIRouter
 from typing import List, Dict, Optional
 from loguru import logger
 
-from persistences.fastapi_dependency.db import get_db
-from persistences.postgresql.modules.posts import posts_table
-from persistences.postgresql.modules.users import users_table
-from persistences.postgresql.modules.votes import votes_table
 
+from persistences.postgresql.modules.posts import posts_table
+from persistences.postgresql.modules.votes import votes_table
 
 from sqlalchemy import (
     text,
@@ -24,12 +22,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.engine import CursorResult, Connection
 
-from routers.validation.fast_api_pydantic.post import (
+from routers.fastapi_dependency.database.sqlalchemy_db import get_db
+from routers.fastapi_dependency.validation.pydantic.post import (
     Post_create,
     Post_update,
     Post_response,
 )
-from routers.validation.auth import oauth2
+from routers.fastapi_dependency.validation.auth import oauth2
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 

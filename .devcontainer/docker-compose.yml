@@ -52,7 +52,6 @@ services:
     container_name: selenium-node-firefox
     networks:
       - api_network
-
       
     shm_size: 2gb
     depends_on:

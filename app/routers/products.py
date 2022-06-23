@@ -1,11 +1,11 @@
 from fastapi import APIRouter, FastAPI, HTTPException, Depends, Response, status
-from configuration.api_service_config.config_fastapi import settings
-from routers.validation.fast_api_pydantic.products import Product
+from routers.fastapi_dependency.validation.pydantic.products import Product
+from routers.fastapi_dependency.database.redis import get_redis
 
-router = APIRouter()
+router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.get("/products")
+@router.get("/")
 def get_products():
     return [format(pk) for pk in Product.all_pks()]
 
@@ -21,16 +21,16 @@ def format(pk: str):
     }
 
 
-@router.post("/products")
+@router.post("/")
 def create_products(product: Product):
     return product.save()
 
 
-@router.get("/product/{pk}")
+@router.get("/{pk}")
 def get(pk: str):
     return Product.get(pk)
 
 
-@router.delete("/product/{pk}")
+@router.delete("/{pk}")
 def delete(pk: str):
     return Product.delete(pk)

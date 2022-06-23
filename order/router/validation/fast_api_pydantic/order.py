@@ -1,5 +1,5 @@
 from redis_om import HashModel
-from persistences.redis.meta import redis
+from persistences.redis.connection import redis
 
 
 class Order(HashModel):
@@ -8,7 +8,7 @@ class Order(HashModel):
     fee: float
     total: float
     quantity: int
-    status: str = str
+    status: str = str  # pending, completed, refunded
 
     class Meta:
         database = redis
