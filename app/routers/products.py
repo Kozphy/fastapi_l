@@ -6,7 +6,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 
 
 @router.get("/")
-def get_products():
+def get_products(redis: get_redis = Depends()):
     return [format(pk) for pk in Product.all_pks()]
 
 
@@ -22,8 +22,15 @@ def format(pk: str):
 
 
 @router.post("/")
-def create_products(product: Product):
-    return product.save()
+def create_products(product: Product, redis: get_redis = Depends()):
+    pipe = redis.pipeline()
+    print(product.dict())
+
+    pipe.hset(name=0, mapping=product.dict())
+    result = pipe.hgetall(0)
+    print(result)
+
+    # return result
 
 
 @router.get("/{pk}")
