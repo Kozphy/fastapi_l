@@ -25,6 +25,12 @@ api_service:
 
   nosql:
     db: redis
+    url_schema: redis
     host: "dsacxz"
     port: "1373714"
+    username: None
     password: "xxxxad"
+    db_num: 0
+    ssl: False
+    ssl_ca_certs: None
+    health_check_interval: 1
