@@ -1,9 +1,18 @@
 from gettext import translation
-from fastapi import APIRouter, FastAPI, HTTPException, Depends, Response, status
+from fastapi import (
+    APIRouter,
+    FastAPI,
+    HTTPException,
+    Depends,
+    Response,
+    status,
+    BackgroundTasks,
+)
 from routers.fastapi_dependency.validation.pydantic.products import Product
 from routers.fastapi_dependency.database.redis import get_redis
 from aioredis import Redis
 from typing import Type, Union
+from persistences.redis.key_format import Keys, make_keys
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -25,11 +34,25 @@ def format(pk: str):
     }
 
 
-@router.post("/")
-async def create_products(product: Product, redis: Redis = Depends(get_redis)):
+async def product_to_redis(key: Keys, mapping_data, redis):
     async with redis.pipeline(transaction=True) as pipe:
-        res = await pipe.hset(name=0, mapping=product.dict()).hgetall(0).execute()
+        res = (
+            await pipe.hset(name=key.product_key("123"), mapping=mapping_data)
+            .hgetall(key.product_key("123"))
+            .execute()
+        )
+    print(key.product_key("123"))
     print(res)
+
+
+@router.post("/")
+async def create_products(
+    product: Product,
+    background_tasks: BackgroundTasks,
+    keys: Keys = Depends(make_keys),
+    redis: Redis = Depends(get_redis),
+):
+    background_tasks.add_task(product_to_redis, keys, product.dict(), redis)
     # result = pipe.hgetall(0)
     # print(result.execute())
 

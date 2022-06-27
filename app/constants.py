@@ -39,6 +39,9 @@ ROOT_PERSISTENCE_DIR_NAME = "persistences"
 # DEFAULT_DB_NAME = 'test'
 # DEFAULT_DB_PORT = 8080
 
+# redis
+DEFAULT_KEY_PREFIX = "fastapi_demo"
+
 
 # robot test framework
 ROOT_TEST_DIR_NAME = "robot_test"

@@ -6,8 +6,16 @@ from configuration.api_service_config.config_fastapi import settings
 from loguru import logger
 from routers import post, products, user, auth, vote
 
+from persistences.redis.key_format import Keys
+
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup_event():
+    keys = Keys()
+
 
 origins = [
     "https://www.google.com",
