@@ -12,9 +12,9 @@ from persistences.redis.key_format import Keys
 app = FastAPI()
 
 
-@app.on_event("startup")
-async def startup_event():
-    keys = Keys()
+# @app.on_event("startup")
+# async def startup_event():
+#     keys = Keys()
 
 
 origins = [

@@ -1,11 +1,12 @@
-from fastapi import HTTPException, Depends, Response, status, APIRouter
+from fastapi import HTTPException, Depends, Response, status, APIRouter, BackgroundTasks
 
 from typing import List, Dict, Optional
 from loguru import logger
 
-
 from persistences.postgresql.modules.posts import posts_table
 from persistences.postgresql.modules.votes import votes_table
+from persistences.redis.cache import get_cache, set_cache
+from aioredis import Redis
 
 from sqlalchemy import (
     text,
@@ -29,41 +30,53 @@ from routers.fastapi_dependency.validation.pydantic.post import (
     Post_response,
 )
 from routers.fastapi_dependency.validation.auth import oauth2
+from routers.fastapi_dependency.database.redis import get_redis
+
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 @router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=List[Post_response]
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=List[Post_response],
+    response_model_exclude_unset=True,
 )
 def create_posts(
     posts: List[Post_create],
     current_user_data: CursorResult = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
+    redis: Redis = Depends(get_redis),
 ):
     logger.debug(f"create posts")
-
+    logger.debug(current_user_data)
     owner_id = current_user_data[0]
     new_posts = []
     for data in posts:
-        data.owner_id = owner_id
-        new_posts.append(data.dict())
+        data = data.dict()
+        data["owner_id"] = owner_id
+        new_posts.append(data)
 
-    logger.debug(f"new_posts is {new_posts}")
-    stmt_insert_posts = insert(posts_table).returning(posts_table)
+    # logger.debug(f"new_posts is {new_posts}")
+    stmt_insert_res_cols = []
+    for col in posts_table.c:
+        if col not in [posts_table.c.owner_id]:
+            stmt_insert_res_cols.append(col)
+
+    stmt_insert_posts = insert(posts_table).returning(*stmt_insert_res_cols)
     all_posts = db.execute(stmt_insert_posts, new_posts).all()
-    logger.debug(f"all_posts is {all_posts}")
+    # logger.debug(f"all_posts is {all_posts}")
 
     response = []
     for data in all_posts:
         # data is considered to be nametuple
         response.append(Post_response(**data, owner=current_user_data))
+    # logger.debug(f"create_post response is {response}")
 
     return response
 
 
 @router.get("/", response_model=List[Post_response])
-# @router.get("/")
 def get_posts(
     current_user_data: CursorResult = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
@@ -71,11 +84,12 @@ def get_posts(
     skip: int = 0,
     precisely_search: Optional[str] = "",
     ambiguous_search: Optional[str] = None,
+    redis: Redis = Depends(get_redis),
 ):
     logger.debug("get posts")
-    # posts = db.execute(text("""SELECT * FROM posts""")).all()
-    # print(f'current_user {current_user}')
+    logger.debug(current_user_data)
     current_user_id = current_user_data[0]
+    logger.debug(current_user_id)
 
     # if both of following are True trigger ambiguously_search to search all posts content
     if precisely_search == "" and ambiguous_search is None:

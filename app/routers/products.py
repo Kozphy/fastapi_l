@@ -1,4 +1,3 @@
-from gettext import translation
 from fastapi import (
     APIRouter,
     FastAPI,
@@ -8,19 +7,30 @@ from fastapi import (
     status,
     BackgroundTasks,
 )
+
 from routers.fastapi_dependency.validation.pydantic.products import Product
 from routers.fastapi_dependency.database.redis import get_redis
+from routers.fastapi_dependency.validation.auth import oauth2
+
 from aioredis import Redis
 from typing import Type, Union
 from persistences.redis.key_format import Keys, make_keys
+from persistences.redis.cache import get_cache, set_cache
+from misc import timer
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
 @router.get("/")
-async def get_products(redis: Redis = Depends(get_redis)):
+async def get_products(
+    keys: Keys = Depends(make_keys), redis: Redis = Depends(get_redis)
+):
+    # data = await get_cache(keys.product_key("123"), redis)
+    # if data is None:
+
     print(await redis.keys())
     # return [format(pk) for pk in Product.all_pks()]
+    # print(data)
 
 
 def format(pk: str):
@@ -34,7 +44,7 @@ def format(pk: str):
     }
 
 
-async def product_to_redis(key: Keys, mapping_data, redis):
+async def product_to_redis(key: Keys, mapping_data, redis: Redis):
     async with redis.pipeline(transaction=True) as pipe:
         res = (
             await pipe.hset(name=key.product_key("123"), mapping=mapping_data)
@@ -45,6 +55,7 @@ async def product_to_redis(key: Keys, mapping_data, redis):
     print(res)
 
 
+@timer
 @router.post("/")
 async def create_products(
     product: Product,
@@ -52,9 +63,8 @@ async def create_products(
     keys: Keys = Depends(make_keys),
     redis: Redis = Depends(get_redis),
 ):
+
     background_tasks.add_task(product_to_redis, keys, product.dict(), redis)
-    # result = pipe.hgetall(0)
-    # print(result.execute())
 
     # return result
 

@@ -40,8 +40,8 @@ ROOT_PERSISTENCE_DIR_NAME = "persistences"
 # DEFAULT_DB_PORT = 8080
 
 # redis
-DEFAULT_KEY_PREFIX = "fastapi_demo"
-
+DEFAULT_KEY_PREFIX = "fastapi-demo"
+CACHE_TIME = 120
 
 # robot test framework
 ROOT_TEST_DIR_NAME = "robot_test"

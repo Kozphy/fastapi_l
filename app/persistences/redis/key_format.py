@@ -1,4 +1,5 @@
 from constants import DEFAULT_KEY_PREFIX
+import ulid
 
 
 def prefixed_key(f):
@@ -10,7 +11,16 @@ def prefixed_key(f):
 
     def prefixed_method(*args, **kwargs):
         self = args[0]
-        key = f(*args, **kwargs)
+        base_key: list = f(*args, **kwargs)
+        for i, v in enumerate(args):
+            if i == 0:
+                continue
+            base_key.append(f"-{v}")
+
+        id = ulid.new().str
+        base_key.append(f":{id}")
+        key = "".join(base_key)
+
         # print(self.prefix)
         # print(key)
         return f"{self.prefix}:{key}"
@@ -35,13 +45,13 @@ class Keys:
     #     return f"price:mean:30s"
 
     @prefixed_key
-    def product_key(self, *args, **kwargs) -> str:
-        return f"product.{args}"
+    def product_key(self, *args, **kwargs) -> list:
+        return ["product"]
 
     @prefixed_key
-    def cache_key(self) -> str:
-        return f"cache"
+    def cache_key(self, *args, **kwargs) -> list:
+        return ["cache"]
 
 
-def make_keys():
+def make_keys() -> Keys:
     return Keys()
