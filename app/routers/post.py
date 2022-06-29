@@ -1,11 +1,15 @@
 from fastapi import HTTPException, Depends, Response, status, APIRouter, BackgroundTasks
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from loguru import logger
+import asyncio
 
 from persistences.postgresql.modules.posts import posts_table
 from persistences.postgresql.modules.votes import votes_table
 from persistences.redis.cache import get_cache, set_cache
+from persistences.redis.key_format import Keys, make_keys
+from module.post import posts_to_database
+
 from aioredis import Redis
 
 from sqlalchemy import (
@@ -44,34 +48,25 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 )
 def create_posts(
     posts: List[Post_create],
+    background_tasks: BackgroundTasks,
     current_user_data: CursorResult = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
     redis: Redis = Depends(get_redis),
+    keys: Keys = Depends(make_keys),
 ):
     logger.debug(f"create posts")
     logger.debug(current_user_data)
     owner_id = current_user_data[0]
-    new_posts = []
-    for data in posts:
-        data = data.dict()
-        data["owner_id"] = owner_id
-        new_posts.append(data)
 
-    # logger.debug(f"new_posts is {new_posts}")
-    stmt_insert_res_cols = []
-    for col in posts_table.c:
-        if col not in [posts_table.c.owner_id]:
-            stmt_insert_res_cols.append(col)
+    cache_key = keys.cache_key(owner_id)
+    posts_to_database(posts, current_user_data, db, redis, cache_key, owner_id=owner_id)
+    # background_tasks.add_task(
+    #     posts_to_database, posts, current_user_data, db, redis, keys
+    # )
+    ## TODO: thinking how to get_cache after set_cache have completed
+    response = asyncio.run(get_cache(cache_key, redis))
 
-    stmt_insert_posts = insert(posts_table).returning(*stmt_insert_res_cols)
-    all_posts = db.execute(stmt_insert_posts, new_posts).all()
-    # logger.debug(f"all_posts is {all_posts}")
-
-    response = []
-    for data in all_posts:
-        # data is considered to be nametuple
-        response.append(Post_response(**data, owner=current_user_data))
-    # logger.debug(f"create_post response is {response}")
+    logger.debug(f"create_posts response is {response}")
 
     return response
 

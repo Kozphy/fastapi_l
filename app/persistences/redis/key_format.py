@@ -1,8 +1,9 @@
 from constants import DEFAULT_KEY_PREFIX
-import ulid
+
+# import ulid
 
 
-def prefixed_key(f):
+def prefixed_key(f) -> str:
     """
     A method decorator that prefixes return values.
     Prefixes any string that the decorated method `f` returns with the value of
@@ -17,8 +18,8 @@ def prefixed_key(f):
                 continue
             base_key.append(f"-{v}")
 
-        id = ulid.new().str
-        base_key.append(f":{id}")
+        # id = ulid.new().str
+        # base_key.append(f":{id}")
         key = "".join(base_key)
 
         # print(self.prefix)
@@ -43,10 +44,13 @@ class Keys:
     # def timeseries_price_key(self) -> str:
     #     """A time series containing 30-second snapshots of BTC price."""
     #     return f"price:mean:30s"
+    # @prefixed_key
+    # def post_key(self, *args, **kwargs) -> list:
+    #     return ["post"]
 
-    @prefixed_key
-    def product_key(self, *args, **kwargs) -> list:
-        return ["product"]
+    # @prefixed_key
+    # def product_key(self, *args, **kwargs) -> list:
+    #     return ["product"]
 
     @prefixed_key
     def cache_key(self, *args, **kwargs) -> list:
