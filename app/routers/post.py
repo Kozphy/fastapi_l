@@ -2,11 +2,10 @@ from fastapi import HTTPException, Depends, Response, status, APIRouter, Backgro
 
 from typing import List, Dict, Optional, Union
 from loguru import logger
-import asyncio
 
 from persistences.postgresql.modules.posts import posts_table
 from persistences.postgresql.modules.votes import votes_table
-from persistences.redis.cache import get_cache, set_cache
+from persistences.redis.cache import get_cache
 from persistences.redis.key_format import Keys, make_keys
 from module.post import posts_to_database
 
@@ -25,7 +24,7 @@ from sqlalchemy import (
     or_,
     func,
 )
-from sqlalchemy.engine import CursorResult, Connection
+from sqlalchemy.engine import Connection
 
 from routers.fastapi_dependency.database.sqlalchemy_db import get_db
 from routers.fastapi_dependency.validation.pydantic.post import (
@@ -49,31 +48,30 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 def create_posts(
     posts: List[Post_create],
     background_tasks: BackgroundTasks,
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
     redis: Redis = Depends(get_redis),
     keys: Keys = Depends(make_keys),
 ):
     logger.debug(f"create posts")
     logger.debug(current_user_data)
-    owner_id = current_user_data[0]
 
-    cache_key = keys.cache_key(owner_id)
+    owner_id = current_user_data["id"]
+    cache_key = keys.cache_key(f"user{owner_id}", "create_posts")
+
     posts_to_database(posts, current_user_data, db, redis, cache_key, owner_id=owner_id)
-    # background_tasks.add_task(
-    #     posts_to_database, posts, current_user_data, db, redis, keys
-    # )
+
     ## TODO: thinking how to get_cache after set_cache have completed
-    response = asyncio.run(get_cache(cache_key, redis))
+    # response = asyncio.run(get_cache(cache_key, redis))
 
-    logger.debug(f"create_posts response is {response}")
+    # logger.debug(f"create_posts response is {response}")
 
-    return response
+    # return response
 
 
 @router.get("/", response_model=List[Post_response])
 def get_posts(
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
     limit: int = 10,
     skip: int = 0,
@@ -136,7 +134,7 @@ def get_posts(
 @router.get("/{id}", response_model=Post_response)
 def get_post(
     id: int,
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
 ):
     logger.debug(f"get one post")
@@ -173,7 +171,7 @@ def get_post(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(
     id: int,
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
 ):
     logger.debug(f"delete post")
@@ -205,7 +203,7 @@ def delete_post(
 def update_post(
     id: int,
     post: Post_update,
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
 ):
     logger.debug(f"update post")

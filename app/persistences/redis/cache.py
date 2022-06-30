@@ -4,6 +4,8 @@ import json
 from constants import CACHE_TIME
 from loguru import logger
 
+from yaml import serialize
+
 
 async def get_cache(keys: str, redis: Redis):
     try:
@@ -18,9 +20,9 @@ async def get_cache(keys: str, redis: Redis):
         raise
 
 
-async def set_cache(data, keys: str, redis: Redis):
+async def set_cache(cache_data: list, keys: str, redis: Redis):
     try:
-        result = await redis.set(name=keys, value=json.dumps(data), ex=CACHE_TIME)
+        result = await redis.set(name=keys, value=json.dumps(cache_data), ex=CACHE_TIME)
         return result
     except Exception as e:
         logger.error(e)

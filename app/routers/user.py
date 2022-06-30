@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Depends, Response, status, APIRouter
 
-from sqlalchemy.engine import Connection, CursorResult
+from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
 from persistences.postgresql.modules.users import users_table
@@ -50,11 +50,11 @@ def create_users(user: User_create, db: Connection = Depends(get_db)):
 @router.get("/{id}", response_model=User_response)
 def get_user(
     id: int,
-    current_user_data: CursorResult = Depends(oauth2.get_current_user),
+    current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
 ):
 
-    current_user_id = current_user_data[0]
+    current_user_id = current_user_data["id"]
 
     stmt = select(users_table).where(
         users_table.c.id == id, users_table.c.id == current_user_id
