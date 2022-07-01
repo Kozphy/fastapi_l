@@ -28,15 +28,12 @@ from sqlalchemy import (
 )
 
 from module.misc import serialize_dates
-from module.to_cache import data_to_redis_cache
 
 
 def posts_to_database(
     posts: List[Post_create],
     current_user_data: dict,
     sqldb: Connection,
-    nosqldb: Union[Redis, None],
-    key: str,
     *args,
     **kwargs,
 ):
@@ -59,6 +56,7 @@ def posts_to_database(
     all_posts: list[dict[str, Any]] = [data._asdict() for data in all_posts]
 
     logger.debug(f"all_posts is {all_posts}")
+
     cache_data = []
     current_user_data = {k: serialize_dates(v) for k, v in current_user_data.items()}
     for data in all_posts:
@@ -66,8 +64,4 @@ def posts_to_database(
         # data is considered to be nametuple
         cache_data.append({**data, "owner": current_user_data})
 
-    logger.debug(f"posts_to_database cache_data is {cache_data}")
-    logger.debug(f"create_posts cache key: {key}")
-
-    ## TODO: fix RuntimeError: got Future <Future pending> attached to a different loop
-    data_to_redis_cache(cache_data, key, nosqldb)
+    return cache_data

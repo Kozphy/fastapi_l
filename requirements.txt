@@ -1,5 +1,6 @@
 aioredis==2.0.1
 alembic==1.7.7
+amqp==5.1.1
 anyio==3.6.1
 appdirs==1.4.4
 asgiref==3.5.2
@@ -8,11 +9,16 @@ async-timeout==4.0.2
 attrs==21.4.0
 bcrypt==3.2.2
 beautifulsoup4==4.11.1
+billiard==3.6.4.0
+celery==5.2.7
 certifi==2022.5.18.1
 cffi==1.15.0
 charset-normalizer==2.0.12
 cleo==1.0.0a4
 click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
 crashtest==0.3.1
 cryptography==37.0.2
 Deprecated==1.2.13
@@ -21,7 +27,7 @@ docutils==0.18.1
 ecdsa==0.17.0
 email-validator==1.2.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api.git@360a70a61aa7741adc6a0b2695acc351bc1f38d2#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api.git@add1f278d4f24749d255e6a9fc9409693f7e3d10#egg=fastapi_learn
 greenlet==1.1.2
 gunicorn==20.1.0
 h11==0.13.0
@@ -30,6 +36,7 @@ httptools==0.4.0
 idna==3.3
 itsdangerous==2.1.2
 Jinja2==3.1.2
+kombu==5.2.4
 loguru==0.6.0
 lxml==4.9.0
 Mako==1.2.0
@@ -39,6 +46,7 @@ outcome==1.2.0
 packaging==21.3
 passlib==1.7.4
 pptree==3.1
+prompt-toolkit==3.0.30
 psycopg==3.0.14
 psycopg-binary==3.0.14
 psycopg-pool==3.1.1
@@ -55,9 +63,9 @@ python-jose==3.3.0
 python-multipart==0.0.5
 python-ulid==1.1.0
 python-version==0.0.2
+pytz==2022.1
 PyYAML==6.0
 redis==4.3.3
-redis-om==0.0.27
 requests==2.27.1
 robotframework==5.0.1
 robotframework-pythonlibcore==3.0.0
@@ -79,10 +87,13 @@ types-redis==4.2.8
 types-six==1.16.16
 typing_extensions==4.2.0
 ujson==5.3.0
+ulid-py==1.1.0
 urllib3==1.26.9
 uvicorn==0.17.6
 uvloop==0.16.0
+vine==5.0.0
 watchgod==0.8.2
+wcwidth==0.2.5
 webdrivermanager==0.10.0
 websockets==10.3
 wrapt==1.14.1

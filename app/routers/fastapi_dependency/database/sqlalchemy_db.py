@@ -15,7 +15,7 @@ def get_engine():
 def get_db() -> Connection:
     engine: Engine = get_engine()
     try:
-        with engine.begin() as conn:
+        with engine.connect() as conn:
             yield conn
     except Exception as e:
         logger.error(f"{e}")

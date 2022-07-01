@@ -14,6 +14,7 @@ services:
   postgresdb:
     container_name: postgresdb
     image: postgres
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

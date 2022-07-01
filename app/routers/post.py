@@ -35,6 +35,7 @@ from routers.fastapi_dependency.validation.pydantic.post import (
 from routers.fastapi_dependency.validation.auth import oauth2
 from routers.fastapi_dependency.database.redis import get_redis
 
+from module.to_cache import data_to_redis_cache
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
@@ -58,8 +59,16 @@ def create_posts(
 
     owner_id = current_user_data["id"]
     cache_key = keys.cache_key(f"user{owner_id}", "create_posts")
+    logger.debug(f"create_posts cache key: {cache_key}")
 
-    posts_to_database(posts, current_user_data, db, redis, cache_key, owner_id=owner_id)
+    cache_data = posts_to_database(
+        posts, current_user_data, db, redis, cache_key, owner_id=owner_id
+    )
+    db.commit()
+    logger.debug(f"posts_to_database cache_data is {cache_data}")
+
+    ## TODO: fix RuntimeError: got Future <Future pending> attached to a different loop
+    data_to_redis_cache(cache_data, cache_key, redis)
 
     ## TODO: thinking how to get_cache after set_cache have completed
     # response = asyncio.run(get_cache(cache_key, redis))

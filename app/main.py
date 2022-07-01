@@ -4,10 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from configuration.api_service_config.config_fastapi import settings
 
 from loguru import logger
+
 from routers import post, products, user, auth, vote
 
-from persistences.redis.key_format import Keys
-
+# from persistences.redis.key_format import Keys
 
 app = FastAPI()
 

@@ -67,8 +67,11 @@ class Redis_custom:
         url = f"{base_url}:{common.port}/{self.db_num}"
         return url
 
+    def get_redis_url(self) -> str:
+        return self.init_redis_url()
+
     async def connect_redis(self) -> Redis:
-        url = self.init_redis_url()
+        url = self.get_redis_url()
         logger.debug(f"Connecting to redis url is {url}")
         redis = await aioredis.from_url(url)
         return redis
