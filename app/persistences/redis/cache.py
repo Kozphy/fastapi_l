@@ -4,7 +4,6 @@ import json
 from constants import CACHE_TIME
 from loguru import logger
 import asyncio
-from main import celery
 
 
 async def get_cache(keys: str, redis: Redis):

@@ -8,4 +8,9 @@ celery = Celery(
     __name__,
     broker=redis.get_redis_url(),
     backend=redis.get_redis_url(),
+    include=["app.task"],
 )
+
+
+if __name__ == "__main__":
+    celery.start()

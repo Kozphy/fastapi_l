@@ -6,6 +6,7 @@ from configuration.api_service_config.config_fastapi import settings
 from loguru import logger
 
 from routers import post, products, user, auth, vote
+from celery_app.task import create_task
 
 # from persistences.redis.key_format import Keys
 
@@ -44,5 +45,6 @@ app.include_router(products.router)
 @app.get("/")
 async def root():
     print(settings)
-
+    res = create_task.delay(2, 2, 2)
+    print(res.get())
     return {"message": "Hello World"}
