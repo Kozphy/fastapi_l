@@ -6,12 +6,12 @@ from sqlalchemy import text, select, literal_column, insert, delete, update
 from persistences.postgresql.modules.users import users_table
 from persistences import utils
 
-from routers.fastapi_dependency.database.sqlalchemy_db import get_db
-from routers.fastapi_dependency.validation.pydantic.user import (
+from routers.dependency.database.sqlalchemy_db import get_db
+from routers.dependency.validation.pydantic.user import (
     User_create,
     User_response,
 )
-from routers.fastapi_dependency.validation.auth import oauth2
+from routers.dependency.validation.auth import oauth2
 
 router = APIRouter(
     prefix="/users",

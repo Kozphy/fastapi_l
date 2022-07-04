@@ -7,13 +7,13 @@ from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from persistences.postgresql.modules.users import users_table
-from routers.fastapi_dependency.database.sqlalchemy_db import get_db
+from routers.dependency.database.sqlalchemy_db import get_db
 
 from sqlalchemy import select, literal_column, insert, delete, update
 from sqlalchemy.engine import Connection, CursorResult, Row
 
 
-from routers.fastapi_dependency.validation.pydantic.auth import TokenData
+from routers.dependency.validation.pydantic.auth import TokenData
 
 from configuration.api_service_config.config_fastapi import settings
 

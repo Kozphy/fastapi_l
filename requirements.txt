@@ -19,6 +19,7 @@ click==8.1.3
 click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.2.0
+cloudpickle==2.1.0
 crashtest==0.3.1
 cryptography==37.0.2
 Deprecated==1.2.13
@@ -26,13 +27,16 @@ dnspython==2.2.1
 docutils==0.18.1
 ecdsa==0.17.0
 email-validator==1.2.1
+eventlet==0.33.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api.git@add1f278d4f24749d255e6a9fc9409693f7e3d10#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api.git@c2e7309eb29b53306e43441ff51685e04c4ccfa9#egg=fastapi_learn
+flower==1.1.0
 greenlet==1.1.2
 gunicorn==20.1.0
 h11==0.13.0
 hiredis==2.0.0
 httptools==0.4.0
+humanize==4.2.3
 idna==3.3
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -46,6 +50,7 @@ outcome==1.2.0
 packaging==21.3
 passlib==1.7.4
 pptree==3.1
+prometheus-client==0.14.1
 prompt-toolkit==3.0.30
 psycopg==3.0.14
 psycopg-binary==3.0.14
@@ -80,6 +85,7 @@ soupsieve==2.3.2.post1
 SQLAlchemy==1.4.36
 SQLAlchemy-Utils==0.38.2
 starlette==0.19.1
+tornado==6.1
 tqdm==4.64.0
 trio==0.21.0
 trio-websocket==0.9.2

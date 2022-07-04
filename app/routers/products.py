@@ -8,9 +8,10 @@ from fastapi import (
     BackgroundTasks,
 )
 
-from routers.fastapi_dependency.validation.pydantic.products import Product
-from routers.fastapi_dependency.database.redis import get_redis
-from routers.fastapi_dependency.validation.auth import oauth2
+from routers.dependency.validation.pydantic.products import Product
+
+# from routers.dependency.database.redis import get_redis
+from routers.dependency.validation.auth import oauth2
 
 from aioredis import Redis
 from typing import Type, Union
@@ -23,7 +24,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 
 @router.get("/")
 async def get_products(
-    keys: Keys = Depends(make_keys), redis: Redis = Depends(get_redis)
+    # keys: Keys = Depends(make_keys), redis: Redis = Depends(get_redis)
 ):
     # data = await get_cache(keys.product_key("123"), redis)
     # if data is None:
@@ -61,7 +62,7 @@ async def create_products(
     product: Product,
     background_tasks: BackgroundTasks,
     keys: Keys = Depends(make_keys),
-    redis: Redis = Depends(get_redis),
+    # redis: Redis = Depends(get_redis),
 ):
 
     background_tasks.add_task(product_to_redis, keys, product.dict(), redis)

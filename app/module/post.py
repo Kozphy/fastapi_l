@@ -1,4 +1,4 @@
-from routers.fastapi_dependency.validation.pydantic.post import (
+from routers.dependency.validation.pydantic.post import (
     Post_create,
     Post_update,
     Post_response,

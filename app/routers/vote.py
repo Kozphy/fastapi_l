@@ -8,9 +8,9 @@ from persistences.postgresql.modules.posts import posts_table
 from sqlalchemy.engine import Connection, CursorResult
 from sqlalchemy import select, insert, delete
 
-from routers.fastapi_dependency.database.sqlalchemy_db import get_db
-from routers.fastapi_dependency.validation.pydantic.vote import Vote
-from routers.fastapi_dependency.validation.auth import oauth2
+from routers.dependency.database.sqlalchemy_db import get_db
+from routers.dependency.validation.pydantic.vote import Vote
+from routers.dependency.validation.auth import oauth2
 
 router = APIRouter(prefix="/vote", tags=["Vote"])
 

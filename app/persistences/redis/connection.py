@@ -1,18 +1,21 @@
 from attrs import define, field
 from persistences.base import Base
 from loguru import logger
+import redis
 import aioredis
-from aioredis import Redis
+from aioredis import Redis as async_redis
+from typing import Union
 
 
 @define
-class Redis_custom:
+class Redis_connect:
     common_config: Base
     db_num: int
     ssl: str
     ssl_ca_certs: str
     decode_responses: bool
     health_check_interval: int
+    url: Union[str, None]
 
     @classmethod
     def from_config(cls, **kwargs):
@@ -23,10 +26,17 @@ class Redis_custom:
         ]
         base = Base.from_config(base_attris, **kwargs)
         kwargs = {k: v for k, v in kwargs.items() if k not in base_attris}
-        redis = cls(common_config=base, decode_responses=True, **kwargs)
+        redis = cls(
+            common_config=base,
+            decode_responses=True,
+            url=None,
+            **kwargs,
+        )
+        if redis.url is None:
+            redis.init_redis_url()
         return redis
 
-    def init_redis_url(self):
+    def init_redis_url(self) -> None:
         """
         redis:// creates a TCP socket connection.
         See more at: https://www.iana.org/assignments/uri-schemes/prov/redis
@@ -62,16 +72,30 @@ class Redis_custom:
 
         if common.url_schema == "unix":
             url = f"{base_url}?db={self.db_num}"
-            return url
+            self.url = url
+            return
 
         url = f"{base_url}:{common.port}/{self.db_num}"
-        return url
+        self.url = url
+        return
 
     def get_redis_url(self) -> str:
-        return self.init_redis_url()
+        return self.url
 
-    async def connect_redis(self) -> Redis:
-        url = self.get_redis_url()
-        logger.debug(f"Connecting to redis url is {url}")
-        redis = await aioredis.from_url(url)
+    async def connect_async_redis(self) -> async_redis:
+        logger.info("connect to async redis")
+        logger.debug(f"Connecting to redis url is {self.url}")
+        redis = await aioredis.from_url(self.url)
         return redis
+
+    def connect_redis(
+        self,
+    ) -> redis:
+        logger.info("connect to sync redis")
+        # pool = redis.ConnectionPool(
+        #     host=self.common_config.host,
+        #     port=self.common_config.port,
+        #     db=self.db_num,
+        # )
+        r = redis.Redis.from_url(self.url)
+        return r

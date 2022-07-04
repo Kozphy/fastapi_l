@@ -26,14 +26,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.engine import Connection
 
-from routers.fastapi_dependency.database.sqlalchemy_db import get_db
-from routers.fastapi_dependency.validation.pydantic.post import (
+from routers.dependency.database.sqlalchemy_db import get_db
+from routers.dependency.validation.pydantic.post import (
     Post_create,
     Post_update,
     Post_response,
 )
-from routers.fastapi_dependency.validation.auth import oauth2
-from routers.fastapi_dependency.database.redis import get_redis
+from routers.dependency.validation.auth import oauth2
+
+# from routers.fastapi_dependency.database.redis import get_redis
 
 from module.to_cache import data_to_redis_cache
 
@@ -51,7 +52,7 @@ def create_posts(
     background_tasks: BackgroundTasks,
     current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
-    redis: Redis = Depends(get_redis),
+    # redis: Redis = Depends(get_redis),
     keys: Keys = Depends(make_keys),
 ):
     logger.debug(f"create posts")
@@ -62,13 +63,13 @@ def create_posts(
     logger.debug(f"create_posts cache key: {cache_key}")
 
     cache_data = posts_to_database(
-        posts, current_user_data, db, redis, cache_key, owner_id=owner_id
+        posts, current_user_data, db, cache_key, owner_id=owner_id
     )
     db.commit()
     logger.debug(f"posts_to_database cache_data is {cache_data}")
 
     ## TODO: fix RuntimeError: got Future <Future pending> attached to a different loop
-    data_to_redis_cache(cache_data, cache_key, redis)
+    data_to_redis_cache(cache_data, cache_key)
 
     ## TODO: thinking how to get_cache after set_cache have completed
     # response = asyncio.run(get_cache(cache_key, redis))
@@ -86,7 +87,7 @@ def get_posts(
     skip: int = 0,
     precisely_search: Optional[str] = "",
     ambiguous_search: Optional[str] = None,
-    redis: Redis = Depends(get_redis),
+    # redis: Redis = Depends(get_redis),
 ):
     logger.debug("get posts")
     logger.debug(current_user_data)

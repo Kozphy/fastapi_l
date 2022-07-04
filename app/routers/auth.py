@@ -9,9 +9,9 @@ from persistences.utils import verify, hash
 from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
-from routers.fastapi_dependency.database.sqlalchemy_db import get_db
-from routers.fastapi_dependency.validation.pydantic.auth import Token
-from routers.fastapi_dependency.validation.auth.oauth2 import create_access_token
+from routers.dependency.database.sqlalchemy_db import get_db
+from routers.dependency.validation.pydantic.auth import Token
+from routers.dependency.validation.auth.oauth2 import create_access_token
 
 router = APIRouter(tags=["Authentication"])
 
