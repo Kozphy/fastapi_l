@@ -1,7 +1,7 @@
 from attrs import define, field
 from persistences.base import Base
 from loguru import logger
-import redis
+import redis as sync_redis
 import aioredis
 from aioredis import Redis as async_redis
 from typing import Union
@@ -15,7 +15,7 @@ class Redis_connect:
     ssl_ca_certs: str
     decode_responses: bool
     health_check_interval: int
-    url: Union[str, None]
+    url: Union[None, str]
 
     @classmethod
     def from_config(cls, **kwargs):
@@ -79,23 +79,23 @@ class Redis_connect:
         self.url = url
         return
 
-    def get_redis_url(self) -> str:
-        return self.url
-
     async def connect_async_redis(self) -> async_redis:
         logger.info("connect to async redis")
         logger.debug(f"Connecting to redis url is {self.url}")
-        redis = await aioredis.from_url(self.url)
+        redis = await aioredis.from_url(
+            self.url, decode_responses=self.decode_responses
+        )
         return redis
 
     def connect_redis(
         self,
-    ) -> redis:
+    ) -> sync_redis:
         logger.info("connect to sync redis")
+        logger.debug(f"Connecting to redis url is {self.url}")
         # pool = redis.ConnectionPool(
         #     host=self.common_config.host,
         #     port=self.common_config.port,
         #     db=self.db_num,
         # )
-        r = redis.Redis.from_url(self.url)
+        r = sync_redis.Redis.from_url(self.url, decode_responses=self.decode_responses)
         return r

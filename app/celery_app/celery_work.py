@@ -3,7 +3,7 @@ from persistences.redis.connection import Redis_connect
 
 from celery import Celery
 
-redis = Redis_denpendency.from_connect(Redis_connect).redis_connect
+redis: Redis_denpendency = Redis_denpendency.from_connect(Redis_connect)
 
 celery = Celery(
     __name__,

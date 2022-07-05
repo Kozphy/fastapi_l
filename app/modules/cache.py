@@ -12,18 +12,25 @@ def data_to_redis_cache(cache_data, key):
     logger.debug("data to redis cache")
 
     try:
-        # logger.debug(type(nosqldb))
-        # db = cloudpickle.dumps(nosqldb)
         result = set_cache.apply_async(
-            (
+            args=[
                 json.dumps(cache_data),
                 key,
-            )
+            ]
         )
-
-        return result
-    except Exception as e:
+        return result.state
+    except set_cache.OperationalError as e:
         logger.error(e)
         raise
 
-    # task = asyncio.create_task()
+
+def get_data_from_redis_cache(key):
+    try:
+        result = get_cache.apply_async(
+            args=[key],
+        )
+        return result.get()
+
+    except get_cache.OperationalError as e:
+        logger.error(e)
+        raise

@@ -1,3 +1,4 @@
+from requests import post
 from routers.dependency.validation.pydantic.post import (
     Post_create,
     Post_update,
@@ -27,7 +28,7 @@ from sqlalchemy import (
     func,
 )
 
-from module.misc import serialize_dates
+from modules.misc import serialize_dates
 
 
 def posts_to_database(
@@ -37,29 +38,33 @@ def posts_to_database(
     *args,
     **kwargs,
 ):
-    logger.debug("posts to database")
-    new_posts = []
+    logger.info("posts to sqldb")
+    posts_with_owner_id = []
     for data in posts:
         data = data.dict()
         data["owner_id"] = kwargs["owner_id"]
-        new_posts.append(data)
+        posts_with_owner_id.append(data)
 
-    logger.debug(f"new_posts is {new_posts}")
+    logger.debug(f"posts_with_owner_id is {posts_with_owner_id}")
     stmt_insert_res_cols = []
     for col in posts_table.c:
         if col not in [posts_table.c.owner_id]:
             stmt_insert_res_cols.append(col)
 
     stmt_insert_posts = insert(posts_table).returning(*stmt_insert_res_cols)
-    all_posts = sqldb.execute(stmt_insert_posts, new_posts).all()
+    posts_from_sqldb = sqldb.execute(stmt_insert_posts, posts_with_owner_id).all()
 
-    all_posts: list[dict[str, Any]] = [data._asdict() for data in all_posts]
+    posts_from_sqldb: list[dict[str, Any]] = [
+        data._asdict() for data in posts_from_sqldb
+    ]
 
-    logger.debug(f"all_posts is {all_posts}")
+    sqldb.commit()
+
+    logger.debug(f"posts_from_db is {posts_from_sqldb}")
 
     cache_data = []
     current_user_data = {k: serialize_dates(v) for k, v in current_user_data.items()}
-    for data in all_posts:
+    for data in posts_from_sqldb:
         data.update({k: serialize_dates(v) for k, v in data.items()})
         # data is considered to be nametuple
         cache_data.append({**data, "owner": current_user_data})

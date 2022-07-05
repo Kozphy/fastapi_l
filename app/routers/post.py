@@ -1,13 +1,14 @@
+from multiprocessing import set_start_method
 from fastapi import HTTPException, Depends, Response, status, APIRouter, BackgroundTasks
 
 from typing import List, Dict, Optional, Union
 from loguru import logger
+import json
 
 from persistences.postgresql.modules.posts import posts_table
 from persistences.postgresql.modules.votes import votes_table
 from persistences.redis.cache import get_cache
 from persistences.redis.key_format import Keys, make_keys
-from module.post import posts_to_database
 
 from aioredis import Redis
 
@@ -34,9 +35,10 @@ from routers.dependency.validation.pydantic.post import (
 )
 from routers.dependency.validation.auth import oauth2
 
-# from routers.fastapi_dependency.database.redis import get_redis
 
-from module.to_cache import data_to_redis_cache
+from modules.post import posts_to_database
+from modules.cache import data_to_redis_cache, get_data_from_redis_cache
+
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
@@ -52,31 +54,52 @@ def create_posts(
     background_tasks: BackgroundTasks,
     current_user_data: dict = Depends(oauth2.get_current_user),
     db: Connection = Depends(get_db),
-    # redis: Redis = Depends(get_redis),
     keys: Keys = Depends(make_keys),
 ):
     logger.debug(f"create posts")
     logger.debug(current_user_data)
 
     owner_id = current_user_data["id"]
-    cache_key = keys.cache_key(f"user{owner_id}", "create_posts")
+    cache_key: str = keys.cache_key(f"user{owner_id}", "create_posts")
     logger.debug(f"create_posts cache key: {cache_key}")
 
     cache_data = posts_to_database(
         posts, current_user_data, db, cache_key, owner_id=owner_id
     )
-    db.commit()
     logger.debug(f"posts_to_database cache_data is {cache_data}")
 
-    ## TODO: fix RuntimeError: got Future <Future pending> attached to a different loop
-    data_to_redis_cache(cache_data, cache_key)
+    set_cache_status = data_to_redis_cache(cache_data, cache_key)
+    logger.debug(f"set_cache_status is {set_cache_status}")
 
     ## TODO: thinking how to get_cache after set_cache have completed
-    # response = asyncio.run(get_cache(cache_key, redis))
+    from_redis_responses = json.loads(get_data_from_redis_cache(cache_key))
+    logger.debug(f"get from redis cache: {from_redis_responses}")
+    responses = [Post_response(**res) for res in from_redis_responses]
+    logger.debug(f"create_posts response is {responses}")
 
-    # logger.debug(f"create_posts response is {response}")
+    return responses
 
-    # return response
+
+@router.get(
+    "/last_create_posts",
+    response_model=List[Post_response],
+    response_model_exclude_unset=True,
+)
+def get_last_create_posts(
+    current_user_data: dict = Depends(oauth2.get_current_user),
+    keys: Keys = Depends(make_keys),
+):
+    logger.debug("get last create posts")
+    logger.debug(current_user_data)
+    owner_id = current_user_data["id"]
+    cache_key: str = keys.cache_key(f"user{owner_id}", "create_posts")
+    logger.debug(f"last_create_posts cache key: {cache_key}")
+    # TODO: fix if cache is None
+    from_redis_responses = json.loads(get_data_from_redis_cache(cache_key))
+    logger.debug(f"get from redis cache: {from_redis_responses}")
+    responses = [Post_response(**res) for res in from_redis_responses]
+    logger.debug(f"get_last_create_posts response is {responses}")
+    return responses
 
 
 @router.get("/", response_model=List[Post_response])
