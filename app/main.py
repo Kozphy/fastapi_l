@@ -5,7 +5,7 @@ from configuration.api_service_config.config_fastapi import settings
 
 from loguru import logger
 
-from routers import post, products, user, auth, vote
+from routers import login, post, products, user, vote
 from celery_app.task import create_task
 
 # from persistences.redis.key_format import Keys
@@ -37,7 +37,7 @@ app.add_middleware(
 
 app.include_router(post.router)
 app.include_router(user.router)
-app.include_router(auth.router)
+app.include_router(login.router)
 app.include_router(vote.router)
 app.include_router(products.router)
 

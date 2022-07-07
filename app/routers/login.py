@@ -3,7 +3,7 @@ from loguru import logger
 from fastapi import HTTPException, Depends, Response, status, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from persistences.postgresql.modules.users import users_table
+from persistences.postgresql.modules.user.users import users_table
 from persistences.utils import verify, hash
 
 from sqlalchemy.engine import Connection

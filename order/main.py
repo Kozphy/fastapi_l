@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.configuration.api_service_config.config_fastapi import settings
 
 from loguru import logger
-from routers import post, products, user, auth, vote
+from routers import login, post, products, user, vote
 
 from order.router import orders
 

@@ -71,8 +71,12 @@ def create_posts(
     set_cache_status = data_to_redis_cache(cache_data, cache_key)
     logger.debug(f"set_cache_status is {set_cache_status}")
 
-    ## TODO: thinking how to get_cache after set_cache have completed
-    from_redis_responses = json.loads(get_data_from_redis_cache(cache_key))
+    from_redis_responses = get_data_from_redis_cache(cache_key)
+    # TODO: repairing set_cache_status is PENDING
+    # and cache have exceed living time,
+    # both of these get from redis data is None.
+    if from_redis_responses:
+        from_redis_responses = json.loads(from_redis_responses)
     logger.debug(f"get from redis cache: {from_redis_responses}")
     responses = [Post_response(**res) for res in from_redis_responses]
     logger.debug(f"create_posts response is {responses}")
@@ -94,7 +98,9 @@ def get_last_create_posts(
     owner_id = current_user_data["id"]
     cache_key: str = keys.cache_key(f"user{owner_id}", "create_posts")
     logger.debug(f"last_create_posts cache key: {cache_key}")
-    # TODO: fix if cache is None
+    # TODO: repairing set_cache_status is PENDING
+    # and cache have exceed living time,
+    # both of these get from redis data is None.
     from_redis_responses = json.loads(get_data_from_redis_cache(cache_key))
     logger.debug(f"get from redis cache: {from_redis_responses}")
     responses = [Post_response(**res) for res in from_redis_responses]

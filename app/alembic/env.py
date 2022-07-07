@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # target metadata
-from persistences.postgresql.modules.users import users_meta
+from persistences.postgresql.modules.user.users import users_meta
 from persistences.postgresql.modules.posts import posts_meta
-from app.persistences.postgresql.modules.votes import votes_meta
+from persistences.postgresql.modules.votes import votes_meta
+from persistences.postgresql.modules.user.account_status import account_status_meta
 
 
 # this is the Alembic Config object, which provides
@@ -26,7 +27,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [users_meta, posts_meta, votes_meta]
+target_metadata = [users_meta, posts_meta, votes_meta, account_status_meta]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -59,11 +60,11 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection,
-     target_metadata=target_metadata)
+    context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 async def run_async_migrations():
     connectable = AsyncEngine(
@@ -76,6 +77,7 @@ async def run_async_migrations():
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
+
 
 def run_sync_migrations():
     connectable = engine_from_config(
@@ -102,8 +104,6 @@ def run_migrations_online():
         # asyncio.run(run_async_migrations())
     else:
         do_run_migrations(connectable)
-    
-        
 
 
 if context.is_offline_mode():

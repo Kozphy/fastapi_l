@@ -6,10 +6,13 @@ from typing import Optional
 class User_create(BaseModel):
     email: EmailStr
     password: str
+    surname: str | None
+    given_name: str | None
+
 
 class User_login(User_create):
     pass
-    
+
 
 class User_response(BaseModel):
     id: int
@@ -18,4 +21,3 @@ class User_response(BaseModel):
 
     class Config:
         orm_mode = True
-
