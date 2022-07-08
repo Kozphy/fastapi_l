@@ -1,14 +1,16 @@
 from fastapi import HTTPException, status
 
 from sqlalchemy import select, insert
-from persistences.postgresql.modules.user.users import users_table
+from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
 from persistences import utils
 from loguru import logger
 
 
 def user_to_sqldb(user, sqldb):
     logger.info("user data to sqldb")
-    stmt_check = select(users_table).where(users_table.c.email == user.email)
+    stmt_check = select(users_in_formosa_table).where(
+        users_in_formosa_table.c.email == user.email
+    )
     check_email = sqldb.execute(stmt_check).first()
     if check_email:
         raise HTTPException(
@@ -23,7 +25,11 @@ def user_to_sqldb(user, sqldb):
     new_user = user.dict()
     logger.debug(f"new user is {new_user}")
 
-    stmt = insert(users_table).values(**new_user).returning(users_table)
+    stmt = (
+        insert(users_in_formosa_table)
+        .values(**new_user)
+        .returning(users_in_formosa_table)
+    )
 
     user_data = sqldb.execute(stmt).first()
     return user_data

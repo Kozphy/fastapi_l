@@ -6,7 +6,7 @@ from loguru import logger
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-from persistences.postgresql.modules.user.users import users_table
+from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
 from routers.dependency.database.sqlalchemy_db import get_db
 
 from sqlalchemy import select, literal_column, insert, delete, update
@@ -68,7 +68,9 @@ def get_current_user(
     token_data = verify_access_token(access_token, credentials_exception)
     logger.debug(f"token_data: {token_data}")
     # check access token id whether in database
-    stmt = select(users_table).where(users_table.c.id == token_data.id)
+    stmt = select(users_in_formosa_table).where(
+        users_in_formosa_table.c.id == token_data.id
+    )
     user = db.execute(stmt).first()._asdict()
 
     if not user:
