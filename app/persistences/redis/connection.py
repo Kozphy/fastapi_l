@@ -66,6 +66,7 @@ class Redis_connect:
 
         if base_url_list[1] == "None" and base_url_list[3] == "None":
             for i in [":", "@"]:
+                # O(n)
                 base_url_list.remove(i)
 
         base_url = "".join(filter(lambda el: el != "None", base_url_list))

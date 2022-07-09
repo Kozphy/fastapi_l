@@ -4,14 +4,14 @@ from fastapi import HTTPException, Depends, Response, status, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
-from persistences.utils import verify, hash
+from routers.dependency.security.utils import verify, hash
 
 from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.validation.pydantic.auth import Token
-from routers.dependency.validation.auth.oauth2 import create_access_token
+from routers.dependency.pydantic.auth import Token
+from routers.dependency.security.oauth2 import create_access_token
 
 router = APIRouter(tags=["Authentication"])
 

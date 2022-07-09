@@ -1,5 +1,5 @@
 from requests import post
-from routers.dependency.validation.pydantic.post import (
+from routers.dependency.pydantic.post import (
     Post_create,
     Post_update,
     Post_response,
@@ -28,7 +28,7 @@ from sqlalchemy import (
     func,
 )
 
-from modules.misc import serialize_dates
+from models.misc import serialize_dates
 
 
 def posts_to_database(

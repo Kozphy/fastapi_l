@@ -13,7 +13,7 @@ from sqlalchemy import select, literal_column, insert, delete, update
 from sqlalchemy.engine import Connection, CursorResult, Row
 
 
-from routers.dependency.validation.pydantic.auth import TokenData
+from routers.dependency.pydantic.auth import TokenData
 
 from configuration.api_service_config.config_fastapi import settings
 

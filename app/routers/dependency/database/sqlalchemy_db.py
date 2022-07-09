@@ -20,5 +20,5 @@ def get_db() -> Connection:
     except Exception as e:
         logger.error(f"{e}")
         raise
-    # finally:
-    #     conn.close()
+    finally:
+        conn.close()

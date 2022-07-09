@@ -6,13 +6,13 @@ from sqlalchemy import text, select, literal_column, insert, delete, update
 from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.validation.pydantic.user import (
+from routers.dependency.pydantic.user import (
     User_create,
     User_response,
 )
-from routers.dependency.validation.auth import oauth2
+from routers.dependency.security import oauth2
 
-from modules.user import user_to_sqldb
+from models.user import user_to_sqldb
 
 router = APIRouter(
     prefix="/users",
@@ -26,14 +26,15 @@ from loguru import logger
 def create_users(user: User_create, db: Connection = Depends(get_db)):
     logger.info("create user")
     user_data = user_to_sqldb(user, db)
+    db.commit()
     # print(result)
 
-    user_title = ["id", "email", "password", "created_at"]
-    res = {}
-    for i, title in enumerate(user_title):
-        res.update({title: result[i]})
+    # user_title = ["id", "email", "password", "created_at"]
+    # res = {}
+    # for i, title in enumerate(user_title):
+    #     res.update({title: result[i]})
 
-    return res
+    # return res
 
 
 @router.get("/{id}", response_model=User_response)

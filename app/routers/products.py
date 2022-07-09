@@ -8,10 +8,10 @@ from fastapi import (
     BackgroundTasks,
 )
 
-from routers.dependency.validation.pydantic.products import Product
+from routers.dependency.pydantic.products import Product
 
 # from routers.dependency.database.redis import get_redis
-from routers.dependency.validation.auth import oauth2
+from routers.dependency.security import oauth2
 
 from aioredis import Redis
 from typing import Type, Union

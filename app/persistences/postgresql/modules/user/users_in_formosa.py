@@ -37,7 +37,7 @@ users_in_formosa_table = Table(
         nullable=False,
     ),
     Column(
-        "account_status_id",
+        "user_status_id",
         BigInteger,
         ForeignKey(users_status_table.c.id, ondelete="CASCADE"),
         server_default="0",

@@ -28,16 +28,16 @@ from sqlalchemy import (
 from sqlalchemy.engine import Connection
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.validation.pydantic.post import (
+from routers.dependency.pydantic.post import (
     Post_create,
     Post_update,
     Post_response,
 )
-from routers.dependency.validation.auth import oauth2
+from routers.dependency.security import oauth2
 
 
-from modules.post import posts_to_database
-from modules.cache import data_to_redis_cache, get_data_from_redis_cache
+from models.post import posts_to_database
+from models.cache import data_to_redis_cache, get_data_from_redis_cache
 
 
 router = APIRouter(prefix="/posts", tags=["Posts"])

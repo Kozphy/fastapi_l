@@ -9,7 +9,7 @@ from sqlalchemy import (
     Identity,
     Enum,
 )
-from sqlalchemy.types import VARCHAR
+from sqlalchemy.types import VARCHAR, TEXT
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text, null
 from enums.gender import Gender
@@ -29,7 +29,7 @@ users_detail_in_formosa_table = Table(
     ),
     Column("surname", VARCHAR(30), server_default="", nullable=False),
     Column("given_name", VARCHAR(50), server_default="", nullable=False),
-    Column("gender", Enum(Gender), nullable=False),
+    Column("gender", Enum(Gender, create_type=False), nullable=False),
     Column("formosa_id_card_letter", VARCHAR(1), nullable=False),
     Column("formosa_id_card", VARCHAR(9), nullable=False),
     Column("address1", VARCHAR(255), nullable=False),
@@ -41,5 +41,6 @@ users_detail_in_formosa_table = Table(
     Column("zip_code", VARCHAR(6), nullable=False),
     Column("country_code", VARCHAR(4), default="+886", nullable=False),
     Column("subscriber_number", VARCHAR(9), nullable=False),
+    Column("description", TEXT(), nullable=False),
     Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
 )
