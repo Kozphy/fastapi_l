@@ -13,7 +13,6 @@ class User_create(User_base):
     given_name: str
     gender: str
     id_card: str
-    phone_number: str
     address1: str
     address2: str
     address3: str

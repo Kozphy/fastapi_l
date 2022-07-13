@@ -6,7 +6,6 @@ from configuration.api_service_config.config_fastapi import settings
 from loguru import logger
 
 # Dependency
-# TODO: fix debug with redis problem
 def get_engine():
     engine: Engine = init_db_engine(settings["persistence"])[0]
     return engine
@@ -17,8 +16,5 @@ def get_db() -> Connection:
     try:
         with engine.connect() as conn:
             yield conn
-    except Exception as e:
-        logger.error(f"{e}")
-        raise
     finally:
         conn.close()
