@@ -8,10 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # target metadata
-from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_meta
-from persistences.postgresql.modules.user.users_detail_in_formosa import (
-    users_detail_in_formosa_meta,
+from persistences.postgresql.modules.user.users_id_card_in_formosa import (
+    users_in_formosa_meta,
 )
+
 from persistences.postgresql.modules.posts import posts_meta
 from persistences.postgresql.modules.votes import votes_meta
 from persistences.postgresql.modules.user.users_status import users_status_meta
@@ -31,7 +31,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = [
-    users_detail_in_formosa_meta,
     users_status_meta,
     users_in_formosa_meta,
     posts_meta,

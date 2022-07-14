@@ -2,7 +2,9 @@ from sqlalchemy import Column, Table, MetaData, Boolean, BigInteger, String, Ide
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text, true
-from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
+from persistences.postgresql.modules.user.users_id_card_in_formosa import (
+    users_in_formosa_table,
+)
 
 posts_meta = MetaData()
 

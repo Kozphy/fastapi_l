@@ -3,7 +3,9 @@ from loguru import logger
 from fastapi import HTTPException, Depends, Response, status, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
+from persistences.postgresql.modules.user.users_id_card_in_formosa import (
+    users_in_formosa_table,
+)
 from routers.dependency.security.utils import verify, hash
 
 from sqlalchemy.engine import Connection

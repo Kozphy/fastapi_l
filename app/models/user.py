@@ -1,8 +1,10 @@
 from fastapi import HTTPException, status
 
 from sqlalchemy import select, insert
-from persistences.postgresql.modules.user.users_in_formosa import users_in_formosa_table
-from persistences.postgresql.modules.user.users_detail_in_formosa import (
+from persistences.postgresql.modules.user.users_id_card_in_formosa import (
+    users_in_formosa_table,
+)
+from persistences.postgresql.modules.user.in_formosa_detail.users_detail_in_formosa import (
     users_detail_in_formosa_table,
 )
 from persistences.postgresql.modules.user.users_status import users_status_table
@@ -48,13 +50,8 @@ def user_to_sqldb(user, sqldb: Connection):
     logger.debug(f"new user is {new_user}")
     try:
         ## TODO: insert value to table
-        # insert_table
-        insert_table = [
-            users_detail_in_formosa_table,
-            users_in_formosa_table,
-        ]
-        stmt_insert_value = [
-            {
+        stmt_insert_t_v = {
+            users_detail_in_formosa_table: {
                 "surname": new_user["surname"],
                 "given_name": new_user["given_name"],
                 "gender": new_user["gender"],
@@ -71,35 +68,34 @@ def user_to_sqldb(user, sqldb: Connection):
                 "subscriber_number": new_user["subscriber_number"],
                 "description": new_user["description"],
             },
-            {
+            users_in_formosa_table: {
                 "email": new_user["email"],
                 "password": new_user["password"],
             },
-        ]
-        table_returning = []
-        for i, table in enumerate(insert_table):
+        }
+
+        stmt_insert_t_r = {
+            users_detail_in_formosa_table: {},
+            users_in_formosa_table: {},
+        }
+        table_returned = []
+        for table, value in stmt_insert_t_v.items():
             # stmt_insert_value = namedtuple(table.name, {})
             # logger.debug(type(table.name))
-            stmt_insert = insert(table).values(stmt_insert_value[i]).returning(table)
+            stmt_insert = insert(table).values(**value).returning(table)
 
-            result = sqldb.execute(stmt_insert).first()
-            table_returning.append(result)
+            table_return = sqldb.execute(stmt_insert).first()._asdict()
+            if table == users_detail_in_formosa_table:
+                logger.debug(
+                    f"users_detail_in_formosa_table return is : {table_return}"
+                )
+                stmt_insert_t_v[users_in_formosa_table].update(
+                    {"user_detail_in_formosa_id": table_return["id"]}
+                )
+            table_returned.append(table_return)
 
-        logger.debug(table_returning)
+        logger.debug(table_returned)
 
-        ## data to users_in_formosa
-        # stmt_insert = {
-        #     "insert": (
-        #         insert(users_in_formosa_table)
-        #         .values(**stmt_insert["value"])
-        #         .returning(users_in_formosa_table)
-        #     ),
-        # }
-
-    ## data to users_detail_in_formosa
-    # stmt_insert["value"] = {}
-
-    # users_in_formosa_data = sqldb.execute(stmt_insert["insert"]).first()
     except Exception as e:
         logger.error(e)
         raise e
