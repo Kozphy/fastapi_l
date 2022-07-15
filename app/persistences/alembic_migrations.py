@@ -20,9 +20,12 @@ def migration_current(engine, url, db_name, verbose=False):
         command.current(cfg, verbose=verbose)
 
 
-def migration_upgrade(engine, url, db_name, revision, sql, tag):
+def migration_upgrade(engine, url, db_name, revision, sql, tag, force):
     with engine.begin() as connection:
         cfg.attributes["connection"] = connection
+        if force:
+            command.upgrade(cfg, revision, sql, tag)
+
         if database_exists(url) == False:
             logger.info(f"{db_name} database not exists, create it")
             create_database(url)
@@ -43,11 +46,11 @@ def migration_downgrade(engine, url, db_name, revision, sql, tag):
         command.downgrade(cfg, revision, sql, tag)
 
 
-def migration_autogenerate(engine, url, db_name, message, **kwargs):
+def migration_revision(engine, url, db_name, message, autogenerate, **kwargs):
     with engine.begin() as connection:
         cfg.attributes["connection"] = connection
         logger.info(f"autogenerate {db_name} database schema")
-        command.revision(cfg, autogenerate=True, message=message, **kwargs)
+        command.revision(cfg, autogenerate=autogenerate, message=message, **kwargs)
 
 
 # def migration_show_history(configured, rev_range='base:current', verbose='True'):

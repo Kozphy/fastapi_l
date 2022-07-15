@@ -9,11 +9,12 @@ from sqlalchemy import (
 from sqlalchemy.types import VARCHAR, TEXT
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text, null
-from persistences.postgresql.modules.user import users_status
 
 users_table_meta = MetaData()
 
 # TODO: Fix Phone number and id_card must be unique
+# TODO: Fix id auto increment need to be correct order when insert failing.
+# TODO: accout support multiple type to login
 users_table = Table(
     "users",
     users_table_meta,
@@ -25,7 +26,22 @@ users_table = Table(
         autoincrement=True,
         nullable=False,
     ),
-    Column("account", VARCHAR(50), nullable=False, unique=True),
+    Column(
+        "user_register_id",
+        ForeignKey("users_register.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    # Column("account", VARCHAR(50), nullable=False, unique=True),
+    # Column(
+    #     "user_email_id",
+    #     ForeignKey("users_email.id", ondelete="CASCADE"),
+    #     nullable=False,
+    # ),
+    # Column(
+    #     "user_phone_id",
+    #     ForeignKey("users_phone.id", ondelete="CASCADE"),
+    #     nullable=False,
+    # ),
     Column("password", VARCHAR(100), nullable=False),
     Column("surname", VARCHAR(30), server_default="", nullable=False),
     Column("given_name", VARCHAR(50), server_default="", nullable=False),
@@ -33,12 +49,18 @@ users_table = Table(
     Column(
         "user_status_id",
         BigInteger,
-        ForeignKey(users_status.users_status_table.c.id, ondelete="CASCADE"),
+        ForeignKey("users_status.id", onupdate="CASCADE", ondelete="CASCADE"),
         server_default="0",
         nullable=False,
     ),
     Column(
         "created_at",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
+    Column(
+        "last_update",
         TIMESTAMP(timezone=True),
         nullable=False,
         server_default=text("now()"),

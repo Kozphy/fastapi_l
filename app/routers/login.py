@@ -3,8 +3,8 @@ from loguru import logger
 from fastapi import HTTPException, Depends, Response, status, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from persistences.postgresql.modules.user.users_id_card_in_formosa import (
-    users_in_formosa_table,
+from persistences.postgresql.modules.user.users_outline_table import (
+    users_table,
 )
 from routers.dependency.security.utils import verify, hash
 
@@ -24,8 +24,8 @@ def login(
     db: Connection = Depends(get_db),
 ):
 
-    check_email_stmt = select(users_in_formosa_table).where(
-        users_in_formosa_table.c.email == user_cridentials.username
+    check_email_stmt = select(users_table).where(
+        users_table.c.email == user_cridentials.username
     )
 
     user = db.execute(check_email_stmt).first()

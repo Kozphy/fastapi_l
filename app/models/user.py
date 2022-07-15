@@ -1,12 +1,11 @@
 from fastapi import HTTPException, status
 
 from sqlalchemy import select, insert
-from persistences.postgresql.modules.user.users_id_card_in_formosa import (
-    users_in_formosa_table,
+
+from persistences.postgresql.modules.user.users_outline_table import (
+    users_table,
 )
-from persistences.postgresql.modules.user.in_formosa_detail.users_detail_in_formosa import (
-    users_detail_in_formosa_table,
-)
+
 from persistences.postgresql.modules.user.users_status import users_status_table
 from routers.dependency.security import utils
 from loguru import logger
@@ -28,9 +27,7 @@ def user_to_sqldb(user, sqldb: Connection):
     logger.debug(user)
     # check email
     try:
-        stmt_check_email = select(users_in_formosa_table).where(
-            users_in_formosa_table.c.email == user.email
-        )
+        stmt_check_email = select(users_table).where(users_table.c.email == user.email)
         check_email = sqldb.execute(stmt_check_email).first()
     except Exception as e:
         logger.error(e)

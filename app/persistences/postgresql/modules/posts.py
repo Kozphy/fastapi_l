@@ -3,7 +3,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text, true
 from persistences.postgresql.modules.user.users_id_card_in_formosa import (
-    users_in_formosa_table,
+    users_id_card_in_formosa_table,
 )
 
 posts_meta = MetaData()
@@ -22,7 +22,7 @@ posts_table = Table(
     Column(
         "owner_id",
         BigInteger,
-        ForeignKey(users_in_formosa_table.c.id, ondelete="CASCADE"),
+        ForeignKey(users_id_card_in_formosa_table.c.id, ondelete="CASCADE"),
         nullable=False,
     ),
     Column("title", String, nullable=False),

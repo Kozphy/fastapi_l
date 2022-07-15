@@ -2,7 +2,6 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Table,
-    MetaData,
     BigInteger,
     Identity,
     Enum,
@@ -10,14 +9,16 @@ from sqlalchemy import (
 from sqlalchemy.types import VARCHAR, TEXT
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
+from sqlalchemy.schema import UniqueConstraint
 from enums.gender import Gender
-from persistences.postgresql.modules.user.users_outline_table import users_table
+from persistences.postgresql.modules.user.users_outline_table import (
+    users_table_meta,
+)
 
-users_in_formosa_meta = MetaData()
 
 users_id_card_in_formosa_table = Table(
     "users_id_card_in_formosa",
-    users_in_formosa_meta,
+    users_table_meta,
     Column(
         "id",
         BigInteger,
@@ -26,8 +27,11 @@ users_id_card_in_formosa_table = Table(
         autoincrement=True,
         nullable=False,
     ),
+    Column("users_id", ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column(
-        "users_id", ForeignKey(users_table.c.id, ondelete="CASCADE"), nullable=False
+        "user_country_id",
+        ForeignKey("users_country.id", ondelete="CASCADE"),
+        nullable=False,
     ),
     Column("gender", Enum(Gender, create_type=False), nullable=False),
     Column("formosa_id_card_letter", VARCHAR(1), nullable=False),
@@ -35,5 +39,7 @@ users_id_card_in_formosa_table = Table(
     Column("issuance_type", VARCHAR(3), nullable=False),
     Column("issuance_date", TIMESTAMP(timezone=True), nullable=False),
     Column("description", TEXT()),
+    Column("create_at", TIMESTAMP(timezone=True), server_default=text("now()")),
     Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
+    UniqueConstraint("formosa_id_card_letter", "formosa_id_card"),
 )

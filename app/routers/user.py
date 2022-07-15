@@ -3,8 +3,8 @@ from fastapi import HTTPException, Depends, Response, status, APIRouter
 from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
-from persistences.postgresql.modules.user.users_id_card_in_formosa import (
-    users_in_formosa_table,
+from persistences.postgresql.modules.user.users_outline_table import (
+    users_table,
 )
 
 from routers.dependency.database.sqlalchemy_db import get_db
@@ -48,9 +48,9 @@ def get_user_info(
 
     current_user_id = current_user_data["id"]
 
-    stmt = select(users_in_formosa_table).where(
-        users_in_formosa_table.c.id == id,
-        users_in_formosa_table.c.id == current_user_id,
+    stmt = select(users_table).where(
+        users_table.c.id == id,
+        users_table.c.id == current_user_id,
     )
 
     user = db.execute(stmt).first()

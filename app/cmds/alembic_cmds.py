@@ -5,7 +5,7 @@ from logger import setup_logging_pre
 from configuration.configuration import Configuration
 from enums.runmode import RunMode
 from persistences.alembic_migrations import (
-    migration_autogenerate,
+    migration_revision,
     migration_current,
     migration_downgrade,
     migration_upgrade,
@@ -51,8 +51,9 @@ def current(ctx):
 @cli.command()
 @click.pass_context
 @click.option("-m", "--message", type=str, default="test")
-def autogenerate(ctx, message):
-    migration_autogenerate(**ctx.obj, message=message)
+@click.option("--autogenerate", type=bool, default=False)
+def revision(ctx, message, autogenerate):
+    migration_revision(**ctx.obj, message=message, autogenerate=autogenerate)
 
 
 @cli.command()
@@ -60,8 +61,15 @@ def autogenerate(ctx, message):
 @click.option("--revision", type=str, default="head")
 @click.option("--sql", type=bool, default=False)
 @click.option("--tag", type=bool, default=None)
-def upgrade(ctx, revision, sql, tag):
-    migration_upgrade(**ctx.obj, revision=revision, sql=sql, tag=tag)
+@click.option("--force", type=bool, default=False)
+def upgrade(ctx, revision, sql, tag, force):
+    migration_upgrade(
+        **ctx.obj,
+        revision=revision,
+        sql=sql,
+        tag=tag,
+        force=force,
+    )
 
 
 @cli.command()

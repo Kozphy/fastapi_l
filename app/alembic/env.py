@@ -8,13 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # target metadata
-from persistences.postgresql.modules.user.users_id_card_in_formosa import (
-    users_in_formosa_meta,
-)
-
 from persistences.postgresql.modules.posts import posts_meta
 from persistences.postgresql.modules.votes import votes_meta
-from persistences.postgresql.modules.user.users_status import users_status_meta
+from persistences.postgresql.modules.user import (
+    users_account,
+    users_country,
+    users_address,
+    users_id_card_in_formosa,
+    users_outline_table,
+    users_status,
+)
 
 
 # this is the Alembic Config object, which provides
@@ -31,10 +34,9 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = [
-    users_status_meta,
-    users_in_formosa_meta,
-    posts_meta,
-    votes_meta,
+    users_outline_table.users_table_meta,
+    # posts_meta,
+    # votes_meta,
 ]
 
 # other values from the config, defined by the needs of env.py,

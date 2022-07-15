@@ -2,20 +2,20 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Table,
-    MetaData,
     BigInteger,
     Identity,
 )
-from sqlalchemy.types import VARCHAR, TEXT
+from sqlalchemy.types import VARCHAR
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from persistences.postgresql.modules.user.users_country import users_country_table
+from persistences.postgresql.modules.user.users_outline_table import (
+    users_table_meta,
+)
 
-users_address_in_formosa_meta = MetaData()
 
-users_address_in_formosa_table = Table(
-    "users_address_in_formosa",
-    users_address_in_formosa_meta,
+users_address_table = Table(
+    "users_address",
+    users_table_meta,
     Column(
         "id",
         BigInteger,
@@ -24,9 +24,10 @@ users_address_in_formosa_table = Table(
         autoincrement=True,
         nullable=False,
     ),
+    Column("users_id", ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
     Column(
         "user_country_id",
-        ForeignKey(users_country_table.c.id, ondelete="CASCADE"),
+        ForeignKey("users_country.id", ondelete="CASCADE"),
         nullable=False,
     ),
     Column("city", VARCHAR(255), nullable=False),
