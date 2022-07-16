@@ -26,11 +26,11 @@ users_table = Table(
         autoincrement=True,
         nullable=False,
     ),
-    Column(
-        "user_register_id",
-        ForeignKey("users_register.id", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=False,
-    ),
+    # Column(
+    #     "user_register_id",
+    #     ForeignKey("users_register.user_id", onupdate="CASCADE", ondelete="CASCADE"),
+    #     nullable=False,
+    # ),
     # Column("account", VARCHAR(50), nullable=False, unique=True),
     # Column(
     #     "user_email_id",

@@ -13,7 +13,7 @@ from persistences.postgresql.modules.user.users_country import users_country_tab
 
 # revision identifiers, used by Alembic.
 revision = "fe0e0f8edb24"
-down_revision = "5437b85fc3e7"
+down_revision = "84dd88e66feb"
 branch_labels = None
 depends_on = None
 

@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 
 from sqlalchemy import select, insert
 
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table,
 )
 

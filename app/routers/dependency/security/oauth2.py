@@ -6,7 +6,7 @@ from loguru import logger
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table,
 )
 from routers.dependency.database.sqlalchemy_db import get_db

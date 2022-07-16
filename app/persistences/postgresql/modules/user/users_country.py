@@ -7,7 +7,7 @@ from sqlalchemy import (
 from sqlalchemy.types import VARCHAR
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table_meta,
 )
 
@@ -24,5 +24,16 @@ users_country_table = Table(
     ),
     Column("country", VARCHAR(255), nullable=False),
     Column("country_code", VARCHAR(10), nullable=False),
-    Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
+    Column(
+        "created_at",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
+    Column(
+        "last_update",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
 )

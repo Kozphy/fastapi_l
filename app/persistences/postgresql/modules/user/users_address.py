@@ -8,7 +8,7 @@ from sqlalchemy import (
 from sqlalchemy.types import VARCHAR
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table_meta,
 )
 
@@ -24,10 +24,14 @@ users_address_table = Table(
         autoincrement=True,
         nullable=False,
     ),
-    Column("users_id", ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column(
+        "users_id",
+        ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+    ),
     Column(
         "user_country_id",
-        ForeignKey("users_country.id", ondelete="CASCADE"),
+        ForeignKey("users_country.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     ),
     Column("city", VARCHAR(255), nullable=False),
@@ -36,5 +40,16 @@ users_address_table = Table(
     Column("address2", VARCHAR(255), nullable=False),
     Column("address3", VARCHAR(255), nullable=False),
     Column("zip_code", VARCHAR(6), nullable=False),
-    Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
+    Column(
+        "created_at",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
+    Column(
+        "last_update",
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
 )

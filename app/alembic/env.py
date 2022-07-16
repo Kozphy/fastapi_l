@@ -15,7 +15,8 @@ from persistences.postgresql.modules.user import (
     users_country,
     users_address,
     users_id_card_in_formosa,
-    users_outline_table,
+    users_outline,
+    users_registration,
     users_status,
 )
 
@@ -34,7 +35,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = [
-    users_outline_table.users_table_meta,
+    users_outline.users_table_meta,
     # posts_meta,
     # votes_meta,
 ]
@@ -70,7 +71,17 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    def process_revision_directives(context, revision, directives):
+        if config.cmd_opts.autogenerate:
+            script = directives[0]
+            if script.upgrade_ops.is_empty():
+                directives[:] = []
+
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        process_revision_directives=process_revision_directives,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
@@ -107,6 +118,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+
     connectable = config.attributes.get("connection", None)
 
     if connectable is None:

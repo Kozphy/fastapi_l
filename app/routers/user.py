@@ -3,7 +3,7 @@ from fastapi import HTTPException, Depends, Response, status, APIRouter
 from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table,
 )
 

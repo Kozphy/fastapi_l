@@ -3,7 +3,7 @@ from loguru import logger
 from fastapi import HTTPException, Depends, Response, status, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from persistences.postgresql.modules.user.users_outline_table import (
+from persistences.postgresql.modules.user.users_outline import (
     users_table,
 )
 from routers.dependency.security.utils import verify, hash

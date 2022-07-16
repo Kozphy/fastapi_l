@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Table, MetaData, Boolean, BigInteger, String, Identity
 from sqlalchemy.sql.expression import false, true
-from persistences.postgresql.modules.user.users_outline_table import users_table_meta
+from persistences.postgresql.modules.user.users_outline import users_table_meta
 
 
 users_status_table = Table(

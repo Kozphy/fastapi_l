@@ -2,23 +2,24 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Table,
+    MetaData,
     BigInteger,
     Identity,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.types import VARCHAR, TEXT
+from sqlalchemy.types import VARCHAR
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from sqlalchemy.schema import UniqueConstraint
-from enums.gender import Gender
 from persistences.postgresql.modules.user.users_outline import (
     users_table_meta,
 )
+from enums.register import Register
 
-gender_enum = ENUM(Gender, name="gender_enum", metadata=users_table_meta)
+register_enum = ENUM(Register, name="register_enum", metadata=users_table_meta)
 
-users_id_card_in_formosa_table = Table(
-    "users_id_card_in_formosa",
+users_register_table = Table(
+    "users_register",
     users_table_meta,
     Column(
         "id",
@@ -29,21 +30,16 @@ users_id_card_in_formosa_table = Table(
         nullable=False,
     ),
     Column(
-        "users_id",
+        "user_id",
         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     ),
     Column(
-        "user_country_id",
-        ForeignKey("users_country.id", onupdate="CASCADE", ondelete="CASCADE"),
+        "registration",
+        VARCHAR(255),
         nullable=False,
     ),
-    Column("gender", gender_enum, nullable=False),
-    Column("formosa_id_card_letter", VARCHAR(1), nullable=False),
-    Column("formosa_id_card", VARCHAR(9), nullable=False),
-    Column("issuance_type", VARCHAR(3), nullable=False),
-    Column("issuance_date", TIMESTAMP(timezone=True), nullable=False),
-    Column("description", TEXT()),
+    Column("registration_type", register_enum, nullable=False),
     Column(
         "create_at",
         TIMESTAMP(timezone=True),
@@ -56,5 +52,5 @@ users_id_card_in_formosa_table = Table(
         nullable=False,
         server_default=text("now()"),
     ),
-    UniqueConstraint("formosa_id_card_letter", "formosa_id_card"),
+    UniqueConstraint("user_id", "registration_type"),
 )
