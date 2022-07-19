@@ -1,16 +1,20 @@
 from fastapi import HTTPException, status
 
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, or_
+from sqlalchemy.engine import Connection
 
-from persistences.postgresql.modules.user.users_outline import (
-    users_table,
+from persistences.postgresql.modules.user import (
+    users_account,
+    users_address,
+    users_country,
+    users_id_card_in_formosa,
+    users_outline,
+    users_registration,
+    users_status,
 )
-
-from persistences.postgresql.modules.user.users_status import users_status_table
 from routers.dependency.security import utils
 from loguru import logger
 
-from sqlalchemy.engine import Connection
 from attrs import define
 from typing import Any
 from collections import namedtuple
@@ -22,13 +26,53 @@ class Node_value:
     stmt: tuple[Any]
 
 
+def check_whether_input_account(user):
+    account_check_none = {
+        "sum_none": 0,
+        "email": 0,
+        "phone": 0,
+        "username": 0,
+    }
+    for account in account_check_none.keys():
+        if user[account] is None:
+            account_check_none["sum_none"] += 1
+            account_check_none[account] += 1
+
+    if account_check_none["sum_none"] == 3:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="please input account"
+        )
+    return account_check_none
+
+
+def check_email_exist(user, sqldb: Connection):
+    # check account
+    stmt_check_email = select(users_registration.users_register_table).where(
+        or_(
+            users_registration.users_register_table.c.registration == user["email"],
+            users_registration.users_register_table.c.registration == user["phone"],
+            users_registration.users_register_table.c.registration == user["username"],
+        )
+    )
+    check_email = sqldb.execute(stmt_check_email).first()
+    return check_email
+
+
 def user_to_sqldb(user, sqldb: Connection):
     logger.info("user data to sqldb")
     logger.debug(user)
-    # check email
+    user = user.dict()
     try:
-        stmt_check_email = select(users_table).where(users_table.c.email == user.email)
-        check_email = sqldb.execute(stmt_check_email).first()
+        # password check
+        if user["password"] != user["password_check"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="please check your password field value, \
+                whether same as password check field value.",
+            )
+
+        account_check_none = check_whether_input_account(user)
+        check_email = check_email_exist(user, sqldb)
     except Exception as e:
         logger.error(e)
         raise e
@@ -43,37 +87,48 @@ def user_to_sqldb(user, sqldb: Connection):
     hash_password = utils.hash(user.password)
     user.password = hash_password
 
-    new_user = user.dict()
-    logger.debug(f"new user is {new_user}")
+    logger.debug(f"Now user with password: {user}")
     try:
         ## TODO: insert value to table
         stmt_insert_t_v = {
-            users_detail_in_formosa_table: {
-                "surname": new_user["surname"],
-                "given_name": new_user["given_name"],
-                "gender": new_user["gender"],
-                "formosa_id_card_letter": new_user["id_card"][0],
-                "formosa_id_card": new_user["id_card"][1:],
-                "address1": new_user["address1"],
-                "address2": new_user["address2"],
-                "address3": new_user["address3"],
-                "country": new_user["country"],
-                "city": new_user["city"],
-                "region": new_user["region"],
-                "zip_code": new_user["zip_code"],
-                "country_code": new_user["country_code"],
-                "subscriber_number": new_user["subscriber_number"],
-                "description": new_user["description"],
+            users_outline.users_table: {
+                "surname": user["surname"],
+                "password": user["password"],
+                "given_name": user["given_name"],
+                "description": user["description"],
             },
-            users_in_formosa_table: {
-                "email": new_user["email"],
-                "password": new_user["password"],
-            },
+            users_registration.users_register_table: {},
+            # users_country.users_country_table: {
+            #     "country": user["country"],
+            #     "country_code": user["country_code"],
+            # },
+            # users_id_card_in_formosa.users_id_card_in_formosa_table: {
+            #     "gender": user["gender"],
+            #     "formosa_id_card_letter": user["id_card"][0],
+            #     "formosa_id_card": user["id_card"][1:],
+            #     "subscriber_number": user["subscriber_number"],
+            # },
+            # users_address.users_address_table: {
+            #     "city": user["city"],
+            #     "region": user["region"],
+            #     "address1": user["address1"],
+            #     "address2": user["address2"],
+            #     "address3": user["address3"],
+            #     "zip_code": user["zip_code"],
+            # },
         }
 
+        ## add not None account to stmt_insert_t_v
+        for account, v in account_check_none.items():
+            if v == 0:
+                stmt_insert_t_v[users_registration.users_register_table].update(
+                    {account: user[account]}
+                )
+
+        ## TODO: 7/18 Anchor point
         stmt_insert_t_r = {
-            users_detail_in_formosa_table: {},
-            users_in_formosa_table: {},
+            users_outline.users_table: {},
+            users_registration.users_register_table: {},
         }
         table_returned = []
         for table, value in stmt_insert_t_v.items():

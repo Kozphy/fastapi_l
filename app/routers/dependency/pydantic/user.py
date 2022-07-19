@@ -4,8 +4,11 @@ from typing import Optional
 
 # request validate
 class User_base(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr]
+    phone: Optional[str]
+    username: Optional[str]
     password: str
+    password_check: str
 
 
 class User_create(User_base):
