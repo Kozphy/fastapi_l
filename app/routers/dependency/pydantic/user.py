@@ -8,24 +8,33 @@ class User_base(BaseModel):
     phone: Optional[str]
     username: Optional[str]
     password: str
-    password_check: str
 
 
 class User_create(User_base):
     surname: str
     given_name: str
-    gender: str
-    id_card: str
+    description: str
+    password_check: str
+
+
+class User_address(BaseModel):
+    city: str
+    region: str
     address1: str
     address2: str
     address3: str
     country: str
-    city: str
-    region: str
     zip_code: str
+
+
+class User_id_card(BaseModel):
+    gender: str
+    id_card: str
+
+
+class User_phone(BaseModel):
     country_code: str
     subscriber_number: str
-    description: str
 
 
 class User_login(User_base):
