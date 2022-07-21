@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends, Response, status, APIRouter
+from fastapi import HTTPException, Depends, Response, status, APIRouter, BackgroundTasks
 
 from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
@@ -14,7 +14,7 @@ from routers.dependency.pydantic.user import (
 )
 from routers.dependency.security import oauth2
 
-from models.user import user_to_sqldb
+from models.user import user_to_sqldb, account_to_proper_sqldb_table
 
 router = APIRouter(
     prefix="/users",
@@ -25,9 +25,15 @@ from loguru import logger
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
-def create_users(user: User_create, db: Connection = Depends(get_db)):
+def create_users(
+    user: User_create,
+    background_tasks: BackgroundTasks,
+    db: Connection = Depends(get_db),
+):
     logger.info("create user")
-    user_data = user_to_sqldb(user, db)
+    sql_return_data = user_to_sqldb(user, db)
+    # background_tasks.add_task(account_to_proper_sqldb_table, sql_return_data, db)
+
     db.commit()
     # print(result)
 

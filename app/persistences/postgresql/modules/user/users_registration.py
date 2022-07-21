@@ -18,6 +18,7 @@ from enums.register import Register
 
 register_enum = ENUM(Register, name="register_enum", metadata=users_table_meta)
 
+
 users_register_table = Table(
     "users_register",
     users_table_meta,

@@ -26,7 +26,7 @@ users_username_table = Table(
         nullable=False,
     ),
     Column(
-        "users_id",
+        "user_id",
         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     ),
@@ -47,7 +47,7 @@ users_email_table = Table(
         nullable=False,
     ),
     Column(
-        "users_id",
+        "user_id",
         ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     ),

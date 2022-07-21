@@ -1,10 +1,10 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union, Literal
 
 # request validate
 class User_base(BaseModel):
-    email: Optional[EmailStr]
+    email: Union[EmailStr, Literal[""]]
     phone: Optional[str]
     username: Optional[str]
     password: str

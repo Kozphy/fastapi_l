@@ -127,7 +127,11 @@ def upgrade():
         ),
         sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("registration", sa.VARCHAR(length=255), nullable=False),
-        # sa.Column('registration_type', postgresql.ENUM('username', 'email', 'mobile', name='register_enum'), nullable=False),
+        # sa.Column(
+        #     "registration_type",
+        #     postgresql.ENUM("username", "email", "mobile", name="register_enum"),
+        #     nullable=False,
+        # ),
         sa.Column(
             "create_at",
             sa.TIMESTAMP(timezone=True),
@@ -148,10 +152,11 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("id"),
     )
+
     register_enum = postgresql.ENUM(
         Register, name="register_enum", metadata=users_table_meta
     )
-    register_enum.create(op.get_bind(), checkfirst=True)
+    register_enum.create(op.get_bind())
     op.add_column("users_register", sa.Column("registration_type", register_enum))
 
     op.create_table(
@@ -163,7 +168,7 @@ def upgrade():
             autoincrement=True,
             nullable=False,
         ),
-        sa.Column("users_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("user_country_id", sa.BigInteger(), nullable=False),
         sa.Column("city", sa.VARCHAR(length=255), nullable=False),
         sa.Column("region", sa.VARCHAR(length=255), nullable=False),
@@ -190,7 +195,7 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["users_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
+            ["user_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -203,7 +208,7 @@ def upgrade():
             autoincrement=True,
             nullable=False,
         ),
-        sa.Column("users_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("email", sa.VARCHAR(length=255), nullable=False),
         sa.Column(
             "create_at",
@@ -218,7 +223,7 @@ def upgrade():
             nullable=True,
         ),
         sa.ForeignKeyConstraint(
-            ["users_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
+            ["user_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
@@ -232,7 +237,7 @@ def upgrade():
             autoincrement=True,
             nullable=False,
         ),
-        sa.Column("users_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("user_country_id", sa.BigInteger(), nullable=False),
         # sa.Column(
         #     "gender",
@@ -269,14 +274,14 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["users_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
+            ["user_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("formosa_id_card_letter", "formosa_id_card"),
     )
 
     gender_enum = postgresql.ENUM(Gender, name="gender_enum", metadata=users_table_meta)
-    gender_enum.create(op.get_bind(), checkfirst=True)
+    gender_enum.create(op.get_bind())
     op.add_column("users_id_card_in_formosa", sa.Column("gender", gender_enum))
     op.create_table(
         "users_phone",
@@ -323,7 +328,7 @@ def upgrade():
             autoincrement=True,
             nullable=False,
         ),
-        sa.Column("users_id", sa.BigInteger(), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("username", sa.VARCHAR(length=255), nullable=False),
         sa.Column(
             "create_at",
@@ -338,7 +343,7 @@ def upgrade():
             nullable=True,
         ),
         sa.ForeignKeyConstraint(
-            ["users_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
+            ["user_id"], ["users.id"], onupdate="CASCADE", ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("username"),
@@ -358,4 +363,6 @@ def downgrade():
     op.drop_table("users")
     op.drop_table("users_status")
     op.drop_table("users_country")
+    op.execute("DROP TYPE gender_enum")
+    op.execute("DROP TYPE register_enum")
     # ### end Alembic commands ###
