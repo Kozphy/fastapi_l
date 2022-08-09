@@ -60,6 +60,12 @@ do_test(Test 5 "5 is 2.236")
 do_test(Test -25 "-25 is (-nan|nan|0)")
 do_test(Test 0.0001 "0.0001 is 0.01")
 
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+set(CPACK_SOURCE_GENERATOR "TGZ")
+include(CPack)
 
 if(SKBUILD)
   message(STATUS "The project is built using scikit-build")
