@@ -4,26 +4,36 @@ cmake_minimum_required(VERSION 3.2.24)
 project(fastapi_demo_with_camke VERSION 0.01)
 # find_package(PythonExtensions REQUIRED)
 
-option(USE_MYMATH "Use tutorial provided math implementation" ON)
-
-configure_file(TutorialConfig.h.in TutorialConfig.h)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(USE_MYMATH)
-  add_subdirectory(MathFunctions)
-  list(APPEND EXTRA_LIBS MathFunctions)
-  # list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/MathFunctions")
-endif()
+# control where the static and shared libraries are built so that on windows
+# we don't need to tinker with the path to run the executable
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+
+add_subdirectory(MathFunctions)
+
+# option(USE_MYMATH "Use tutorial provided math implementation" ON)
+# if(USE_MYMATH)
+#   add_subdirectory(MathFunctions)
+#   list(APPEND EXTRA_LIBS MathFunctions)
+#   # list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/MathFunctions")
+# endif()
 
 # add_subdirectory(MathFunctions)
 
 # add the executable
 add_executable(Test main.cpp)
 
-target_link_libraries(Test PUBLIC ${EXTRA_LIBS})
+target_link_libraries(Test PUBLIC MathFunctions)
 
 target_include_directories(Test PUBLIC
                            "${PROJECT_BINARY_DIR}"
@@ -35,7 +45,8 @@ install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
   DESTINATION include
   )
 
-enable_testing()
+# enable_testing()
+include(CTest)
 
 # does the application run, segfault?
 add_test(NAME Runs COMMAND Test 25)
