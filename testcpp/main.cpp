@@ -6,7 +6,7 @@
 #include "TutorialConfig.h"
 
 // #ifdef USE_MYMATH
-#include "mathFunctions.h"
+// #include "mathFunctions.h"
 // #endif
 
 int main(int argc, char* argv[])
@@ -24,10 +24,10 @@ int main(int argc, char* argv[])
 
     // calculate square root
     // #ifdef USE_MYMATH
-    const double outputValue = mathFunctions::mysqrt(inputValue);
+    const double outputValue = std::sqrt(inputValue);
     // #else
         // const double outputValue = sqrt(inputValue);
-    #endif
+    // #endif
     std::cout << "The square root of " << inputValue << " is " << outputValue
                 << std::endl;
     return 0;
