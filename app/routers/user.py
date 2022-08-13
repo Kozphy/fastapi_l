@@ -21,8 +21,6 @@ router = APIRouter(
     tags=["Users"],
 )
 
-from loguru import logger
-
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
 def create_users(

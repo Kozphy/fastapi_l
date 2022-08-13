@@ -1,0 +1,13 @@
+[requires]
+boost/1.79.0
+poco/1.12.2
+cppcheck/2.7.5
+
+[generators]
+cmake_find_package
+CMakeDeps
+CMakeToolchain
+
+[options]
+boost:shared=False
+poco:shared=False

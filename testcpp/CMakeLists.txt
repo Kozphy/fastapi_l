@@ -5,48 +5,28 @@ project(fastapi_demo_with_camke VERSION 0.01
         DESCRIPTION "test"
         LANGUAGES CXX
 )
-# find_package(PythonExtensions REQUIRED)
 
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# control where the static and shared libraries are built so that on windows
-# we don't need to tinker with the path to run the executable
-# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+# Using the "cmake_find_package" generator
+set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
 
-# option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+find_package(Boost REQUIRED)
+find_package(Poco REQUIRED)
+find_package(cppcheck REQUIRED)
 
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 
-# add_subdirectory(MathFunctions)
 
-# option(USE_MYMATH "Use tutorial provided math implementation" ON)
-# if(USE_MYMATH)
-#   add_subdirectory(MathFunctions)
-#   list(APPEND EXTRA_LIBS MathFunctions)
-#   # list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/MathFunctions")
-# endif()
+add_executable(Test src/main.cpp)
 
-# add_subdirectory(MathFunctions)
+target_link_libraries(Test Poco::Poco Boost::Boost cppcheck::cppcheck)
 
-# add the executable
-add_executable(Test main.cpp)
 
-# target_link_libraries(Test PUBLIC MathFunctions)
-
-# target_include_directories(Test PUBLIC
-#                            "${PROJECT_BINARY_DIR}"
-#                           #  ${EXTRA_INCLUDES}
-#                            )
-
-# install(TARGETS Test DESTINATION bin)
-# install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
-#   DESTINATION include
-#   )
 
 # enable_testing()
 # include(CTest)
@@ -59,13 +39,7 @@ add_executable(Test main.cpp)
 # add_test(NAME Usage COMMAND Test)
 # set_tests_properties(PROPERTIES PASS_REGULAR_EXPRESSION "Usage:.*number")
 
-# define a function to simplify adding tests
-# function(do_test target arg result)
-#   add_test(NAME Comp:${arg} COMMAND ${target} ${arg})
-#   set_tests_properties(Comp:${arg}
-#     PROPERTIES PASS_REGULAR_EXPRESSION ${result} 
-#   )
-# endfunction()
+
 
 # do a bunch of result based tests
 # do_test(Test 4 "4 is 2")
