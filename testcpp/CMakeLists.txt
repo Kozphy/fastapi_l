@@ -15,15 +15,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
 set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
 
+# TODO: fix cppcheck build error
 find_package(Boost REQUIRED)
 find_package(Poco REQUIRED)
-find_package(cppcheck REQUIRED)
+find_package(cppcheck)
 
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 
 
+# add_executable(${PROJECT_NAME} src/main.cpp)
 add_executable(Test src/main.cpp)
 
+# target_link_libraries(${PROJECT_NAME} cppcheck::cppcheck)
 target_link_libraries(Test Poco::Poco Boost::Boost cppcheck::cppcheck)
 
 

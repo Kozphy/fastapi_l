@@ -2,12 +2,18 @@
 boost/1.79.0
 poco/1.12.2
 cppcheck/2.7.5
+# spdlog/1.10.0
 
 [generators]
 cmake_find_package
+# TODO: setting properly
 CMakeDeps
 CMakeToolchain
 
 [options]
 boost:shared=False
 poco:shared=False
+
+[imports]
+bin, *.dll -> ./bin # Copies all dll files from packages bin folder to my "bin" folder
+lib, *.dylib* -> ./bin # Copies all dylib files from packages lib folder to my "bin" folder

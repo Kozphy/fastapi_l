@@ -10,6 +10,7 @@ attrs==21.4.0
 bcrypt==3.2.2
 beautifulsoup4==4.11.1
 billiard==3.6.4.0
+bottle==0.12.23
 celery==5.2.7
 certifi==2022.5.18.1
 cffi==1.15.0
@@ -20,16 +21,20 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.2.0
 cloudpickle==2.1.0
+colorama==0.4.5
+conan==1.51.2
 crashtest==0.3.1
 cryptography==37.0.2
 Deprecated==1.2.13
+distro==1.6.0
 dnspython==2.2.1
 docutils==0.18.1
 ecdsa==0.17.0
 email-validator==1.2.1
 eventlet==0.33.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api.git@c2e7309eb29b53306e43441ff51685e04c4ccfa9#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api.git@5ab4a5632c78dc4f9b3c36b239700b7a74ec43d4#egg=fastapi_learn
+fasteners==0.17.3
 flower==1.1.0
 greenlet==1.1.2
 gunicorn==20.1.0
@@ -45,10 +50,13 @@ loguru==0.6.0
 lxml==4.9.0
 Mako==1.2.0
 MarkupSafe==2.1.1
+node-semver==0.6.1
 orjson==3.6.8
 outcome==1.2.0
 packaging==21.3
 passlib==1.7.4
+patch-ng==1.17.4
+pluginbase==1.0.1
 pptree==3.1
 prometheus-client==0.14.1
 prompt-toolkit==3.0.30
@@ -59,10 +67,13 @@ psycopg2==2.9.3
 pyasn1==0.4.8
 pycparser==2.21
 pydantic==1.9.1
+Pygments==2.12.0
+PyJWT==2.4.0
 pylev==1.4.0
 pyOpenSSL==22.0.0
 pyparsing==3.0.9
 PySocks==1.7.1
+python-dateutil==2.8.2
 python-dotenv==0.20.0
 python-jose==3.3.0
 python-multipart==0.0.5
