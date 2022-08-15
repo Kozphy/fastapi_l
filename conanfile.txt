@@ -2,11 +2,11 @@
 boost/1.79.0
 poco/1.12.2
 cppcheck/2.7.5
-# spdlog/1.10.0
+spdlog/1.10.0
 
 [generators]
 cmake_find_package
-# TODO: setting properly
+cmake_paths
 CMakeDeps
 CMakeToolchain
 

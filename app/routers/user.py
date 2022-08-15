@@ -15,6 +15,7 @@ from routers.dependency.pydantic.user import (
 from routers.dependency.security import oauth2
 
 from models.user import user_to_sqldb, account_to_proper_sqldb_table
+from loguru import logger
 
 router = APIRouter(
     prefix="/users",
