@@ -187,3 +187,6 @@ _deps
 
 # canon
 training
+
+# cppcheck
+cppcheck_result
