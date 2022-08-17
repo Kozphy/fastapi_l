@@ -19,7 +19,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 # set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
-# TODO: fix cppcheck not work
 find_package(Boost REQUIRED)
 find_package(Poco REQUIRED)
 find_package(cppcheck)
@@ -46,42 +45,47 @@ else()
   message(FATAL_ERROR "Poco not found")
 endif()
 
+# TODO: fix cppcheck check-config not found header file error and 
+# cppcheck-build-dir output format not correctly build at the second time .
 if(TARGET cppcheck::cppcheck)
   message("using cppcheck")
   find_program(CPPCHECK cppcheck)
-  set(CPPCHECK_TEMPLATE "cppcheck:{file}:{line}: {severity}:{message}")
+  # set(CPPCHECK_TEMPLATE "cppcheck: {file}:{line}:{severity}, {id}, {message}\\n{code}")
+  # set(CPPCHECK_TEMPLATE_LOCATION "{file}:{line}: note: {info}\\n{code}")
+  set(CPPCHECK_CHECK_DSN "${CMAKE_CURRENT_SOURCE_DIR}/testcpp/")
   set(CPPCHECK_BUILD_RESULT "${CMAKE_CURRENT_SOURCE_DIR}/testcpp/cppcheck_result")
+  list(
+    APPEND CPPCHECK_CMD_OPTION
+      "--enable=all"
+      "--inconclusive"
+      "--force"
+      "--inline-suppr"
+      "--verbose"
+      # "--check-config"
+      "--project=compile_commands.json"
+      "--template=gcc"
+      # "--check-library"
+      # "--enable=information"
+      # "--addon=cert.py"
+      # "--template=${CPPCHECK_TEMPLATE}"
+      # "--template-location=${CPPCHECK_TEMPLATE_LOCATION}"
+      # "--cppcheck-build-dir=${CPPCHECK_BUILD_RESULT}"
+      # unwant in release
+      "-i ${CMAKE_CURRENT_SOURCE_DIR}/testcpp/training"
+  )
+
   message("Path: ${CPPCHECK}")
-  # message("Current source: ${CMAKE_CURRENT_SOURCE_DIR}")
+  message("Current source: ${CMAKE_CURRENT_SOURCE_DIR}")
   target_link_libraries(${PROJECT_NAME} cppcheck::cppcheck)
-  # set(CMAKE_CXX_CPPCHECK ${CPPCHECK}
-  #     --enable=all
-  #     --inconclusive
-  #     --force
-  #     --inline-suppr
-  #     --template=${CPPCHECK_TEMPLATE}
-  #     --verbose
-  #     -i ${CMAKE_CURRENT_SOURCE_DIR}/testcpp/
-  # )
 
   add_custom_target(cppcheck ALL COMMAND ${CPPCHECK}
-      --enable=all
-      --inconclusive
-      --force
-      --inline-suppr
-      --template=${CPPCHECK_TEMPLATE}
-      --cppcheck-build-dir=${CPPCHECK_BUILD_RESULT}
-      --verbose
-      --check-config
-      --project=compile_commands.json
-      # unwant in release
-      -i ${CMAKE_CURRENT_SOURCE_DIR}/testcpp/training
-    ${CMAKE_CURRENT_SOURCE_DIR}/testcpp/
-    COMMENT "Checking ..."
+    ${CPPCHECK_CMD_OPTION}
+    ${CPPCHECK_CHECK_DSN} 
+    COMMENT "Cppcheck Checking ..."
     VERBATIM
   )
 
-  message("debug value: ${CMAKE_CXX_CPPCHECK}")
+  message("debug value: ${CPPCHECK_CMD_OPTION}")
 else()
   message(FATAL_ERROR "cppcheck not found")
 endif()
