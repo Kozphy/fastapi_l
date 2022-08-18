@@ -10,6 +10,7 @@ project(fastapi_demo_with_cmake VERSION 0.01
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+# SET(CMAKE_CXX_FLAGS "-fmodules-ts")
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 # set(DCMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -33,6 +34,8 @@ add_executable(${PROJECT_NAME} testcpp/src/main.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            )
+target_compile_options(${PROJECT_NAME} PRIVATE -fmodules-ts)
+
 if(TARGET Boost::Boost)
   target_link_libraries(${PROJECT_NAME} Boost::Boost)
 else()
@@ -45,8 +48,9 @@ else()
   message(FATAL_ERROR "Poco not found")
 endif()
 
-# TODO: fix cppcheck check-config not found header file error and 
-# cppcheck-build-dir output format not correctly build at the second time .
+# TODO: fix cppcheck check-config not found header file error,
+# load from build dir output with \0 is wrong format and
+# output xml which convert to html report.
 if(TARGET cppcheck::cppcheck)
   message("using cppcheck")
   find_program(CPPCHECK cppcheck)
@@ -62,14 +66,16 @@ if(TARGET cppcheck::cppcheck)
       "--inline-suppr"
       "--verbose"
       # "--check-config"
+      # "--xml"
+      # "--output-file=${CPPCHECK_BUILD_RESULT}/output.xml"
       "--project=compile_commands.json"
       "--template=gcc"
+      "--suppress=missingInclude"
       # "--check-library"
-      # "--enable=information"
       # "--addon=cert.py"
       # "--template=${CPPCHECK_TEMPLATE}"
       # "--template-location=${CPPCHECK_TEMPLATE_LOCATION}"
-      # "--cppcheck-build-dir=${CPPCHECK_BUILD_RESULT}"
+      "--cppcheck-build-dir=${CPPCHECK_BUILD_RESULT}"
       # unwant in release
       "-i ${CMAKE_CURRENT_SOURCE_DIR}/testcpp/training"
   )
@@ -81,11 +87,15 @@ if(TARGET cppcheck::cppcheck)
   add_custom_target(cppcheck ALL COMMAND ${CPPCHECK}
     ${CPPCHECK_CMD_OPTION}
     ${CPPCHECK_CHECK_DSN} 
+    # "--xml 2> output.xml"
+    # "htmlreport/cppcheck-html-htmlreport --file=output.xml --report-dir=${CPPCHECK_BUILD_RESULT} --source-dir=."
     COMMENT "Cppcheck Checking ..."
     VERBATIM
   )
 
   message("debug value: ${CPPCHECK_CMD_OPTION}")
+  message("htmlreport: ${CPPCHECK_HTMLREPORT}")
+  # message("bin path: ${CPPCHECK}")
 else()
   message(FATAL_ERROR "cppcheck not found")
 endif()

@@ -1,19 +1,25 @@
-FROM python:3.10
+FROM ubuntu
 
 WORKDIR /workspace
 
-COPY requirements.txt ./
-
-RUN pip install --no-cache-dir -r requirements.txt
-
-RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends \
+#TODO: fix build too slow
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
        vim \
        nano \
        less \
        g++-arm-linux-gnueabihf \
-       cmake
+       cmake \
+       git \
+    #    python3.10 \
+    #    python3-pip
 
-RUN conan profile new default --detect --force
-RUN conan profile update settings.compiler.libcxx=libstdc++11 default
+
+# COPY requirements.txt ./
+
+# RUN pip install --no-cache-dir -r requirements.txt
+
+
+# RUN conan profile new default --detect --force
+# RUN conan profile update settings.compiler.libcxx=libstdc++11 default
 # RUN pip install --editable .

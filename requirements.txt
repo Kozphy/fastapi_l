@@ -33,7 +33,7 @@ ecdsa==0.17.0
 email-validator==1.2.1
 eventlet==0.33.1
 fastapi==0.78.0
--e git+https://github.com/Kozphy/learn_build_api.git@5ab4a5632c78dc4f9b3c36b239700b7a74ec43d4#egg=fastapi_learn
+-e git+https://github.com/Kozphy/learn_build_api.git@1db79ec41c61d647784eebb0f1e06f494e43082d#egg=fastapi_learn
 fasteners==0.17.3
 flower==1.1.0
 greenlet==1.1.2

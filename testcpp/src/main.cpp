@@ -8,25 +8,16 @@
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "spdlog/spdlog.h"
 #include <boost/lambda/lambda.hpp>
+import Example;
+import std.core;
 
 
+using namespace std;
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 
 // Test cppcheck 
-void foo(int x)
-{
-    int buf[10];
-    if (x == 1000)
-        buf[x] = 0; // <- ERROR
-}
 
-void foo2(int x)
-{
-    int buf[10];
-    buf[x] = 0; // <- ERROR
-    if (x == 1000) {}
-}
 
 int main(int argc, char* argv[])
 {
@@ -36,15 +27,13 @@ int main(int argc, char* argv[])
 
     // std::for_each(
     //     in(std::cin), in(), std::cout << (_1 * 3) << " " );
-
+    cout << "The result of f() is " << Example_NS::f() << endl; // 42
     // test cppcheck
     char a[10];
     a[10]=0;
 
     // test Poco
     // Session session("PostgreSQL", "sample.db");
-    foo(10);
-    foo2(10);
     spdlog::info("Welcome to spdlog!");
     std::cout << "Hello" << std::endl;
     if (argc < 2) {
