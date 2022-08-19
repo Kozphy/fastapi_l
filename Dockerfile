@@ -1,6 +1,6 @@
 FROM python:3.10
 
-WORKDIR /src
+WORKDIR /workspace
 
 COPY requirements.txt ./
 

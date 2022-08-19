@@ -36,7 +36,10 @@
 				"TomiTurtiainen.rf-intellisense",
 				"donjayamanne.python-extension-pack",
 				"TabNine.tabnine-vscode",
-				"ms-python.black-formatter"
+				"ms-python.black-formatter",
+				"twxs.cmake",
+				"ms-vscode.cmake-tools",
+				"ms-vscode.cpptools-extension-pack"
 			]
 		}
 	}

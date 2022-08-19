@@ -9,7 +9,6 @@
 #include "spdlog/spdlog.h"
 #include <boost/lambda/lambda.hpp>
 import Example;
-import std.core;
 
 
 using namespace std;

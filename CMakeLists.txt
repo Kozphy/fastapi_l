@@ -8,6 +8,7 @@ project(fastapi_demo_with_cmake VERSION 0.01
 
 
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
+# set(CMAKE_CXX_COMPILER "usr/local/bin/gcc")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # SET(CMAKE_CXX_FLAGS "-fmodules-ts")
