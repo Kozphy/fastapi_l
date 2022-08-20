@@ -3,45 +3,50 @@
 // #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "TutorialConfig.h"
+#include "VersionConfig.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/PostgreSQL/Connector.h"
+#include "Poco/Data/DataException.h"
 #include "spdlog/spdlog.h"
 #include <boost/lambda/lambda.hpp>
-import Example;
 
+//TODO: wait for stable cmake with gcc c++ 20 modules support.
+// import Example;
 
-using namespace std;
-using namespace Poco::Data::Keywords;
+using std::cerr;
+using std::endl;
+namespace poco_data_keywords = Poco::Data::Keywords;
 using Poco::Data::Session;
+using Poco::Data::Statement;
+using Poco::Data::DataException;
 
-// Test cppcheck 
-
-
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
-    // test boost
-    // using namespace boost::lambda;
-    // typedef std::istream_iterator<int> in;
 
-    // std::for_each(
-    //     in(std::cin), in(), std::cout << (_1 * 3) << " " );
-    cout << "The result of f() is " << Example_NS::f() << endl; // 42
-    // test cppcheck
-    char a[10];
-    a[10]=0;
-
-    // test Poco
-    // Session session("PostgreSQL", "sample.db");
-    spdlog::info("Welcome to spdlog!");
-    std::cout << "Hello" << std::endl;
     if (argc < 2) {
         // report version
-        std::cout << argv[0] << " Version " << Tutorial_VERSION_MAJOR << "."
-                    << Tutorial_VERSION_MINOR << std::endl;
+        std::cout << argv[0] << " Version " << Demo_VERSION_MAJOR << "."
+                    << Demo_VERSION_MINOR << std::endl;
         std::cout << "Usage: " << argv[0] << " number" << std::endl;
         return 1;
     }
+
+    try 
+    {
+
+        spdlog::info("start session");
+        Poco::Data::PostgreSQL::Connector::registerConnector();
+        Session session("PostgreSQL", "sample.db");
+    }
+
+    catch(DataException &e)
+    {
+        spdlog::error("error");
+        cerr << e.message() << endl;
+        return 1;
+    }
+
+
 
     return 0;
 }

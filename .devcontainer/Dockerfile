@@ -13,6 +13,8 @@ RUN  apt-get update \
         nano \
         less \
         # g++-arm-linux-gnueabihf \
+        libcairo2-dev \
+        pkg-config \
         cmake \
         git \
         libpq-dev \

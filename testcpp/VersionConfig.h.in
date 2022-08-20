@@ -1,0 +1,3 @@
+// the configured options and settings for Tutorial
+#define Demo_VERSION_MAJOR @fastapi_demo_with_cmake_VERSION_MAJOR@
+#define Demo_VERSION_MINOR @fastapi_demo_with_cmake_VERSION_MINOR@
