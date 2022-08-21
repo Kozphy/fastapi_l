@@ -1,8 +1,9 @@
-# Sources
-file(GLOB SRCS_G "src/*.cpp")
+add_library(Logger STATIC
+    "src/Logger.cpp")
 
-# Headers
-file(GLOB_RECURSE HDRS_G "include/*.h")
+target_link_libraries(Logger STATIC spdlog::spdlog)
 
-add_library(Logger HDRS_G SRCS_G)
-target_include_directories()
+target_include_directories(Logger
+    PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
