@@ -35,14 +35,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
+# third party library
 find_package(Boost REQUIRED)
 find_package(Poco REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 find_package(cppcheck)
-find_package(spdlog)
 
 configure_file(testcpp/VersionConfig.h.in VersionConfig.h)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/testcpp)
+
 
 if(SKBUILD)
   message(STATUS "The project is built using scikit-build")

@@ -3,8 +3,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
 )
 
+message("logger found ${LOGGER_FOUND}")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Logger)
 
+# third party library
 if(TARGET Boost::Boost)
   target_link_libraries(${PROJECT_NAME} Boost::Boost)
 else()
@@ -15,6 +17,18 @@ if(TARGET Poco::Poco)
   target_link_libraries(${PROJECT_NAME} Poco::Poco)
 else()
   message(FATAL_ERROR "Poco not found")
+endif()
+
+if(TARGET spdlog::spdlog)
+  target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
+else()
+  message(FATAL_ERROR "spdlog not found")
+endif()
+
+if(TARGET fmt::fmt)
+    target_link_libraries(${PROJECT_NAME} fmt::fmt)
+else()
+    message(FATAL_message "fmt not found")
 endif()
 
 # TODO: fix cppcheck check-config not found header file error,
@@ -67,10 +81,4 @@ if(TARGET cppcheck::cppcheck)
   # message("bin path: ${CPPCHECK}")
 else()
   message(FATAL_ERROR "cppcheck not found")
-endif()
-
-if(TARGET spdlog::spdlog)
-  target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
-else()
-  message(FATAL_ERROR "spdlog not found")
 endif()

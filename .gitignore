@@ -193,3 +193,6 @@ cppcheck_result
 
 # docker_token
 docker_token
+
+# testcpp
+testcpp/logs

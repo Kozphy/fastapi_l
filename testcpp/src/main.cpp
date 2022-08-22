@@ -7,7 +7,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/DataException.h"
-#include "spdlog/spdlog.h"
+// #include "Logger/Logger.h"
 #include <boost/lambda/lambda.hpp>
 
 //TODO: wait for stable cmake with gcc c++ 20 modules support.
@@ -34,14 +34,14 @@ int main(int argc, const char* argv[])
     try 
     {
 
-        spdlog::info("start session");
+        // spdlog::info("start session");
         Poco::Data::PostgreSQL::Connector::registerConnector();
         Session session("PostgreSQL", "sample.db");
     }
 
     catch(DataException &e)
     {
-        spdlog::error("error");
+        // spdlog::error("error");
         cerr << e.message() << endl;
         return 1;
     }
