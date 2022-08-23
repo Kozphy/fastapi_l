@@ -4,8 +4,7 @@
 namespace Demo {
     using spdlog::set_pattern;
     
-    template<typename log_size, typename log_file>
-    inline ostream &operator<<(ostream &os, const logger_setting<log_size, log_file> &c)
+    inline ostream &operator<<(ostream &os, const logger_setting &c)
     {
         os << "logger name: " << c.get_logger_name()
         <<",logger pattern: " << c.get_pattern()
@@ -15,8 +14,7 @@ namespace Demo {
         return os;
     }
 
-    template<typename log_size, typename log_file>
-    logger_setting<log_size, log_file>::logger_setting()
+    logger_setting::logger_setting()
     {
         try
         {
@@ -32,13 +30,12 @@ namespace Demo {
         
     }
 
-    template<typename log_size, typename log_file>
-    logger_setting<log_size, log_file>::~logger_setting()
+
+    logger_setting::~logger_setting()
     {
     }
 
-    template<typename log_size, typename log_file>
-    inline void logger_setting<log_size, log_file>::set_format(){
-       set_pattern("%n %v");
+    inline void logger_setting::set_format(){
+       set_pattern(format_pattern);
     }
 }

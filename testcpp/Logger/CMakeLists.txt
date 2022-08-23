@@ -1,7 +1,9 @@
 add_library(Logger STATIC
     "src/Logger.cpp")
 
-target_link_libraries(Logger STATIC spdlog::spdlog fmt::fmt)
+add_library(Demo::Logger ALIAS Logger)
+
+target_link_libraries(Logger PRIVATE spdlog::spdlog fmt::fmt)
 
 target_include_directories(Logger
     PUBLIC

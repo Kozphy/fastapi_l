@@ -16,17 +16,26 @@ using std::cout;
 using std::endl;
 
 namespace Demo {
-    template<typename log_size, typename log_file>
     class logger_setting 
     {
-            friend ostream &operator<<(ostream &os, const logger_setting<log_size, log_file> &c);
+            friend ostream &operator<<(ostream &os, const logger_setting &c);
             public:
-                logger_setting();
+                explicit logger_setting();
+                ~logger_setting();
+
+                // setter
                 void set_format();
                 void set_pattern(string pattern){
                     format_pattern = pattern; 
                 };
+                void set_max_size(unsigned int size){
+                   max_size = size; 
+                };
+                void set_max_files(unsigned int nums){
+                    max_files = nums;
+                }
 
+                // getter
                 string get_logger_name() const{
                     return logger_name;
                 };
@@ -34,22 +43,21 @@ namespace Demo {
                     return format_pattern;
                 };
 
-                log_size get_max_size() const {
+                unsigned int get_max_size() const {
                     return max_size;
                 };
 
-                log_file get_max_files() const {
+                unsigned int get_max_files() const {
                     return max_files;
                 };
 
-            protected:
-                ~logger_setting();
+            // protected:
             private:
                 string logger_name;
                 string format_pattern;
                 shared_ptr<spdlog::logger> _logger;
-                log_size max_size;
-                log_file max_files;
+                unsigned int max_size = 1024 * 1024 * 5;
+                unsigned int max_files = 3;
     }; 
 }
 

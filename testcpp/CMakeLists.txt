@@ -3,30 +3,31 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
 )
 
-message("logger found ${LOGGER_FOUND}")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Logger)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger)
+
 
 # third party library
 if(TARGET Boost::Boost)
-  target_link_libraries(${PROJECT_NAME} Boost::Boost)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::Boost)
 else()
   message(FATAL_ERROR "Boost not found")
 endif()
 
 if(TARGET Poco::Poco)
-  target_link_libraries(${PROJECT_NAME} Poco::Poco)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Poco::Poco)
 else()
   message(FATAL_ERROR "Poco not found")
 endif()
 
 if(TARGET spdlog::spdlog)
-  target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
+  target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
 else()
   message(FATAL_ERROR "spdlog not found")
 endif()
 
 if(TARGET fmt::fmt)
-    target_link_libraries(${PROJECT_NAME} fmt::fmt)
+    target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 else()
     message(FATAL_message "fmt not found")
 endif()
@@ -65,7 +66,7 @@ if(TARGET cppcheck::cppcheck)
 
   message("Path: ${CPPCHECK}")
   message("Current source: ${CMAKE_CURRENT_SOURCE_DIR}")
-  target_link_libraries(${PROJECT_NAME} cppcheck::cppcheck)
+  target_link_libraries(${PROJECT_NAME} PRIVATE cppcheck::cppcheck)
 
   add_custom_target(cppcheck ALL COMMAND ${CPPCHECK}
     ${CPPCHECK_CMD_OPTION}

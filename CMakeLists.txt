@@ -29,6 +29,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+# message("List of compile features: ${CMAKE_CXX_COMPILE_FEATURES}")
 # target_compile_options(${PROJECT_NAME} PRIVATE -fmodules-ts)
 
 
@@ -44,7 +45,9 @@ find_package(cppcheck)
 
 configure_file(testcpp/VersionConfig.h.in VersionConfig.h)
 
+# add subdirectories
 add_subdirectory(${PROJECT_SOURCE_DIR}/testcpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/testcpp/Logger)
 
 
 if(SKBUILD)

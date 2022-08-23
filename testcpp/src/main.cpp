@@ -7,7 +7,7 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/DataException.h"
-// #include "Logger/Logger.h"
+#include "Demo/Logger.h"
 #include <boost/lambda/lambda.hpp>
 
 //TODO: wait for stable cmake with gcc c++ 20 modules support.
@@ -19,6 +19,7 @@ namespace poco_data_keywords = Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::DataException;
+using Demo::logger_setting;
 
 int main(int argc, const char* argv[])
 {
@@ -33,7 +34,7 @@ int main(int argc, const char* argv[])
 
     try 
     {
-
+        logger_setting Logger1;
         // spdlog::info("start session");
         Poco::Data::PostgreSQL::Connector::registerConnector();
         Session session("PostgreSQL", "sample.db");
