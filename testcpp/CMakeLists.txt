@@ -8,8 +8,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger)
 
 
 # third party library
-if(TARGET Boost::Boost)
-  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::Boost)
+if(TARGET Boost::boost)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
 else()
   message(FATAL_ERROR "Boost not found")
 endif()

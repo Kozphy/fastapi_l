@@ -3,7 +3,7 @@ add_library(Logger STATIC
 
 add_library(Demo::Logger ALIAS Logger)
 
-target_link_libraries(Logger PRIVATE spdlog::spdlog fmt::fmt)
+target_link_libraries(Logger PRIVATE spdlog::spdlog fmt::fmt Boost::boost)
 
 target_include_directories(Logger
     PUBLIC

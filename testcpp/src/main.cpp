@@ -8,7 +8,7 @@
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/DataException.h"
 #include "Demo/Logger.h"
-#include <boost/lambda/lambda.hpp>
+#include "boost/smart_ptr/shared_ptr.hpp"
 
 //TODO: wait for stable cmake with gcc c++ 20 modules support.
 // import Example;
@@ -20,6 +20,8 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::DataException;
 using Demo::logger_setting;
+using boost::shared_ptr;
+
 
 int main(int argc, const char* argv[])
 {
@@ -34,7 +36,8 @@ int main(int argc, const char* argv[])
 
     try 
     {
-        logger_setting Logger1;
+        shared_ptr<logger_setting> Logger1("test");
+        Logger1._logger -> info("start session");
         // spdlog::info("start session");
         Poco::Data::PostgreSQL::Connector::registerConnector();
         Session session("PostgreSQL", "sample.db");
@@ -42,7 +45,7 @@ int main(int argc, const char* argv[])
 
     catch(DataException &e)
     {
-        // spdlog::error("error");
+        spdlog::error("error");
         cerr << e.message() << endl;
         return 1;
     }

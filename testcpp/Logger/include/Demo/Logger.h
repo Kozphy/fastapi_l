@@ -2,44 +2,63 @@
 #define Demo_Logger_INCLUDE
 
 #include <iostream>
+#include <string_view>
+#include <map>
+// #include <variant>
 #include <fmt/core.h>
+#include <boost/foreach.hpp>
+#include "boost/variant.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/dist_sink.h"
 
-using std::string;
-using std::ostream;
-using std::shared_ptr;
-using std::cout;
-using std::endl;
+
 
 namespace Demo {
+    using std::string;
+    using std::string_view;
+    using std::ostream;
+    using std::shared_ptr;
+    using std::cout;
+    using std::endl;
+    using std::make_shared;
+    using std::map;
+    using boost::variant;
+    using boost::get;
     class logger_setting 
     {
             friend ostream &operator<<(ostream &os, const logger_setting &c);
             public:
-                explicit logger_setting();
+                explicit logger_setting(string logger_name, 
+                                        unsigned int max_size = 1024 * 1024 * 5, 
+                                        unsigned int max_files = 3);
                 ~logger_setting();
 
+
                 // setter
-                void set_format();
-                void set_pattern(string pattern){
-                    format_pattern = pattern; 
+                inline void set_pattern(const string_view &pattern){
+                    this -> format_pattern = pattern; 
+                    set_spdlog_pattern();
                 };
-                void set_max_size(unsigned int size){
+                inline void set_max_size(unsigned int size){
                    max_size = size; 
                 };
-                void set_max_files(unsigned int nums){
+                inline void set_max_files(unsigned int nums){
                     max_files = nums;
                 }
 
                 // getter
-                string get_logger_name() const{
+                inline string get_logger_name() const{
                     return logger_name;
                 };
-                string get_pattern() const{
+
+                inline string get_err_logger_name() const{
+                    return err_logger_name;
+                };
+                inline string get_pattern() const{
                     return format_pattern;
                 };
 
@@ -51,14 +70,22 @@ namespace Demo {
                     return max_files;
                 };
 
-            // protected:
+            protected:
+                void set_spdlog_pattern();
             private:
-                string logger_name;
-                string format_pattern;
                 shared_ptr<spdlog::logger> _logger;
-                unsigned int max_size = 1024 * 1024 * 5;
-                unsigned int max_files = 3;
-    }; 
+                shared_ptr<spdlog::logger> _logger_file;
+                shared_ptr<spdlog::logger> _logger_err;
+                shared_ptr<spdlog::logger> _logger_err_file;
+                string logger_name;
+                string logger_file_name;
+                string err_logger_name;
+                string format_pattern = "%^ %@";
+                string logger_dir_dsn = "logs";
+                string logger_dsn;
+                unsigned int max_size;
+                unsigned int max_files;
+    };
 }
 
 #endif // Demo_Logger_INCLUDE
