@@ -10,6 +10,7 @@
 #include "Demo/Logger.h"
 #include "boost/smart_ptr/shared_ptr.hpp"
 
+
 //TODO: wait for stable cmake with gcc c++ 20 modules support.
 // import Example;
 
@@ -36,16 +37,16 @@ int main(int argc, const char* argv[])
 
     try 
     {
-        shared_ptr<logger_setting> Logger1("test");
-        Logger1._logger -> info("start session");
-        // spdlog::info("start session");
+        shared_ptr<logger_setting> pLogger1(new logger_setting("test", 0));
+        std::cout << *pLogger1 << std::endl;
+        SPDLOG_INFO("start session");
         Poco::Data::PostgreSQL::Connector::registerConnector();
         Session session("PostgreSQL", "sample.db");
     }
 
     catch(DataException &e)
     {
-        spdlog::error("error");
+        SPDLOG_ERROR("error");
         cerr << e.message() << endl;
         return 1;
     }

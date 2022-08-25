@@ -4,61 +4,66 @@
 #include <iostream>
 #include <string_view>
 #include <map>
+#include <vector>
+// #include <functional>
 // #include <variant>
 #include <fmt/core.h>
-#include <boost/foreach.hpp>
-#include "boost/variant.hpp"
+// #include "boost/variant.hpp>
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
-#include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/dist_sink.h"
 
 
 
 namespace Demo {
-    using std::string;
-    using std::string_view;
-    using std::ostream;
-    using std::shared_ptr;
-    using std::cout;
-    using std::endl;
-    using std::make_shared;
-    using std::map;
-    using boost::variant;
-    using boost::get;
+
     class logger_setting 
     {
-            friend ostream &operator<<(ostream &os, const logger_setting &c);
+            friend std::ostream &operator<<(std::ostream &os, const logger_setting &c);
             public:
-                explicit logger_setting(string logger_name, 
+                explicit logger_setting(std::string logger_name, 
+                                        int logger_level = 0,
                                         unsigned int max_size = 1024 * 1024 * 5, 
                                         unsigned int max_files = 3);
-                ~logger_setting();
+                // ~logger_setting();
 
 
                 // setter
-                inline void set_pattern(const string_view &pattern){
+                inline void set_pattern(const std::string_view &pattern)
+                {
                     this -> format_pattern = pattern; 
                     set_spdlog_pattern();
                 };
-                inline void set_max_size(unsigned int size){
-                   max_size = size; 
-                };
-                inline void set_max_files(unsigned int nums){
-                    max_files = nums;
+
+                inline void set_level(const int &level)
+                {
+                    this -> logger_level = level;
+                    set_spdlog_level();
                 }
 
+                inline void set_max_size(const unsigned int &size){
+                   max_size = size; 
+                };
+
+                inline void set_max_files(const unsigned int &nums){
+                    max_files = nums;
+                };
+
                 // getter
-                inline string get_logger_name() const{
+                inline std::shared_ptr<spdlog::logger> get_logger() const {
+                    return _logger;
+                };
+
+                inline std::string get_logger_name() const{
                     return logger_name;
                 };
 
-                inline string get_err_logger_name() const{
-                    return err_logger_name;
-                };
-                inline string get_pattern() const{
+                inline int get_logger_level() const {
+                    return logger_level;
+                }
+
+                inline std::string get_pattern() const{
                     return format_pattern;
                 };
 
@@ -72,17 +77,16 @@ namespace Demo {
 
             protected:
                 void set_spdlog_pattern();
+                void set_spdlog_level();
             private:
-                shared_ptr<spdlog::logger> _logger;
-                shared_ptr<spdlog::logger> _logger_file;
-                shared_ptr<spdlog::logger> _logger_err;
-                shared_ptr<spdlog::logger> _logger_err_file;
-                string logger_name;
-                string logger_file_name;
-                string err_logger_name;
-                string format_pattern = "%^ %@";
-                string logger_dir_dsn = "logs";
-                string logger_dsn;
+                std::shared_ptr<spdlog::logger> _logger;
+                std::shared_ptr<spdlog::logger> _logger_file;
+                std::string logger_name;
+                std::string logger_file_name;
+                int logger_level;
+                std::string format_pattern = "[%@] [%!] %^[%l]%$: %v";
+                std::string logger_dir_dsn = "logs";
+                std::string logger_dsn;
                 unsigned int max_size;
                 unsigned int max_files;
     };

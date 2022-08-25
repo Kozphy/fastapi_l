@@ -2,20 +2,32 @@
 
 
 namespace Demo {
+    using std::string;
+    using std::string_view;
+    using std::ostream;
+    using std::shared_ptr;
+    using std::cout;
+    using std::endl;
+    using std::make_shared;
+    using std::function;
+    using std::map;
+    // using boost::variant;
+    // using boost::get;
+    using std::vector;
     using spdlog::set_pattern;
     
     ostream &operator<<(ostream &os, const logger_setting &c)
     {
-        os << "logger name: " << c.get_logger_name()
-        << ",err logger name: " <<  c.get_err_logger_name()
-        <<",logger pattern: " << c.get_pattern()
-        << ",logger file size: " << c.get_max_size()
-        << ",logger max files: " << c.get_max_files();
+        os << "{\n" << "\tlogger name: " << c.get_logger_name() << "," << "\n"
+        << "\tlogger level: " << c.get_logger_level() << "," << "\n"
+        <<"\tlogger pattern: " << c.get_pattern()<< "," << "\n"
+        << "\tlogger file size: " << c.get_max_size() << "," << "\n"
+        << "\tlogger max files: " << c.get_max_files() << "\n}";
 
         return os;
     }
     
-    logger_setting::logger_setting(string logger_name, unsigned int max_size , unsigned int max_files)
+    logger_setting::logger_setting(string logger_name, int logger_level, unsigned int max_size , unsigned int max_files)
     {
         try
         {
@@ -36,30 +48,27 @@ namespace Demo {
             // TODO: need refactor
             this -> max_size = max_size;
             this -> max_files = max_files;
+            this -> logger_level = logger_level;
             this -> logger_name = logger_name;
-            this -> err_logger_name = fmt::format("{0}_stderr", logger_name);
-            this -> logger_dsn = fmt::format("{0}/{1}", this -> logger_dir_dsn, logger_name);
             this -> logger_file_name = fmt::format("{0}.txt", logger_name);
+            this -> logger_dsn = fmt::format("{0}/{1}", logger_dir_dsn, logger_file_name);
 
-            // destribute log message
-            // TODO: complete
-            auto dist_sink = make_shared<spdlog::sinks::dist_sink_st>();
-            auto console = make_shared<spdlog::sinks::stdout_color_sink_mt>(logger_name);
-            auto err_console = make_shared<spdlog::sinks::stderr_color_sink_mt>(err_logger_name);
-            auto file_console = make_shared<spdlog::sinks::rotating_file_sink_mt>(logger_file_name, max_size, max_files);
-            dist_sink -> add_sink(console);
-            dist_sink -> add_sink(err_console);
-            dist_sink -> add_sink(file_console);
+            
+            vector<spdlog::sink_ptr> sinks{
+                make_shared<spdlog::sinks::stdout_color_sink_mt>(),
+                make_shared<spdlog::sinks::rotating_file_sink_mt>(logger_dsn, max_size, max_files)
+            };
 
-            // console logger
-            // auto console = spdlog::stdout_color_mt(logger_name);
-            // auto err_console = spdlog::stderr_color_mt(err_logger_name);
+            auto combined_logger = make_shared<spdlog::logger>(logger_name, begin(sinks), end(sinks));
+            // Note:: if manually created logger, have to register_logger, otherwise will be segement fault.
+            spdlog::register_logger(combined_logger);
+            spdlog::set_default_logger(combined_logger);
 
-            // file logger
-            // auto console_file = spdlog::rotating_logger_mt(logger_name, logger_dsn, max_size, max_files);
-            _logger = spdlog::get(logger_name);
-            _logger_err = spdlog::get(this -> err_logger_name);
+            // if use spdlog::get you need to be careful segement fault here.
+            // _logger = spdlog::get(logger_name);
+            this -> _logger = combined_logger;
             set_spdlog_pattern();
+            set_spdlog_level();
         }
         catch(const spdlog::spdlog_ex& ex)
         {
@@ -67,14 +76,39 @@ namespace Demo {
         }
     }
 
+    void logger_setting::set_spdlog_level()
+    {
+        auto spdlog_level = spdlog::level::info;
+        /* In spdlog/common.h spdlog::level
+            #define SPDLOG_LEVEL_TRACE 0
+            #define SPDLOG_LEVEL_DEBUG 1
+            #define SPDLOG_LEVEL_INFO 2
+            #define SPDLOG_LEVEL_WARN 3
+            #define SPDLOG_LEVEL_ERROR 4
+            #define SPDLOG_LEVEL_CRITICAL 5
+            #define SPDLOG_LEVEL_OFF 6
+        */
+        switch(this -> logger_level){
+            case 0:
+                SPDLOG_INFO("verbose level set to info");
+                break;
+            case 1:
+                spdlog_level = spdlog::level::debug;
+                SPDLOG_INFO("verbose level set to debug");
+                break;
+            case 2:
+                spdlog_level = spdlog::level::trace;
+                SPDLOG_INFO("verbose level set to trace");
+                break;
+        }
+        _logger -> set_level(spdlog_level);
+    }
     void logger_setting::set_spdlog_pattern()
     {
         _logger -> set_pattern(this -> format_pattern);
-        _logger_err -> set_pattern(this -> format_pattern);
-        
     }
 
-    logger_setting::~logger_setting()
-    {
-    }
+    // logger_setting::~logger_setting()
+    // {
+    // }
 }
