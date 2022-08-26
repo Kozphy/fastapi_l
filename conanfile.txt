@@ -4,6 +4,9 @@ poco/1.12.2
 cppcheck/2.7.5
 spdlog/1.10.0
 fmt/9.0.0
+cli11/2.2.0
+yaml-cpp/0.7.0
+protobuf/3.21.4
 
 [generators]
 cmake_find_package

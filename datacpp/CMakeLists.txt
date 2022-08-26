@@ -5,11 +5,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger)
+target_link_libraries(${PROJECT_NAME} PRIVATE Demo::protobuf_config)
 
 
 # third party library
 if(TARGET Boost::boost)
-  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost Boost::filesystem)
 else()
   message(FATAL_ERROR "Boost not found")
 endif()
@@ -30,6 +31,20 @@ if(TARGET fmt::fmt)
     target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 else()
     message(FATAL_message "fmt not found")
+endif()
+
+if(TARGET yaml-cpp::yaml-cpp)
+    target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
+else()
+    message(FATAL_message "yaml-cpp not found")
+endif()
+
+if(TARGET protobuf::protobuf)
+  # target_link_libraries(${PROJECT_NAME} PRIVATE protobuf::protobuf)
+  message ("protobuf found")
+  add_subdirectory(configuration)
+else()
+  message(FATAL_message "protobuf not found")
 endif()
 
 # TODO: fix cppcheck check-config not found header file error,

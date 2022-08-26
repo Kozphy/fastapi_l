@@ -1,0 +1,9 @@
+persistence:
+  ORM: False
+  db: postgresql 
+  user: xxxx
+  password: "123557"
+  host: "host.docker.internal"
+  db_name: fdksuirew
+  port: "5432"
+  ssl: False

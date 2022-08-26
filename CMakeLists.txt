@@ -42,12 +42,14 @@ find_package(Poco REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(cppcheck)
+find_package("yaml-cpp")
+find_package(Protobuf REQUIRED)
 
-configure_file(testcpp/VersionConfig.h.in VersionConfig.h)
+configure_file(datacpp/BasicConfig.h.in BasicConfig.h)
 
 # add subdirectories
-add_subdirectory(${PROJECT_SOURCE_DIR}/testcpp)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/testcpp/Logger)
+add_subdirectory(${PROJECT_SOURCE_DIR}/datacpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/Logger)
 
 
 if(SKBUILD)

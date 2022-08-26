@@ -11,8 +11,6 @@ namespace Demo {
     using std::make_shared;
     using std::function;
     using std::map;
-    // using boost::variant;
-    // using boost::get;
     using std::vector;
     using spdlog::set_pattern;
     
@@ -51,12 +49,12 @@ namespace Demo {
             this -> logger_level = logger_level;
             this -> logger_name = logger_name;
             this -> logger_file_name = fmt::format("{0}.txt", logger_name);
-            this -> logger_dsn = fmt::format("{0}/{1}", logger_dir_dsn, logger_file_name);
+            this -> logger_file_dsn = fmt::format("{0}/{1}", logger_dir_dsn, logger_file_name);
 
             
             vector<spdlog::sink_ptr> sinks{
                 make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-                make_shared<spdlog::sinks::rotating_file_sink_mt>(logger_dsn, max_size, max_files)
+                make_shared<spdlog::sinks::rotating_file_sink_mt>(logger_file_dsn, max_size, max_files)
             };
 
             auto combined_logger = make_shared<spdlog::logger>(logger_name, begin(sinks), end(sinks));
@@ -101,11 +99,11 @@ namespace Demo {
                 SPDLOG_INFO("verbose level set to trace");
                 break;
         }
-        _logger -> set_level(spdlog_level);
+        _logger.lock() -> set_level(spdlog_level);
     }
     void logger_setting::set_spdlog_pattern()
     {
-        _logger -> set_pattern(this -> format_pattern);
+        _logger.lock() -> set_pattern(this -> format_pattern);
     }
 
     // logger_setting::~logger_setting()

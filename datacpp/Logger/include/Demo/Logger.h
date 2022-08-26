@@ -5,10 +5,7 @@
 #include <string_view>
 #include <map>
 #include <vector>
-// #include <functional>
-// #include <variant>
 #include <fmt/core.h>
-// #include "boost/variant.hpp>
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/sinks/rotating_file_sink.h"
@@ -51,11 +48,11 @@ namespace Demo {
                 };
 
                 // getter
-                inline std::shared_ptr<spdlog::logger> get_logger() const {
+                inline std::weak_ptr<spdlog::logger> get_logger() const {
                     return _logger;
                 };
 
-                inline std::string get_logger_name() const{
+                inline std::string_view get_logger_name() const{
                     return logger_name;
                 };
 
@@ -63,7 +60,7 @@ namespace Demo {
                     return logger_level;
                 }
 
-                inline std::string get_pattern() const{
+                inline std::string_view get_pattern() const{
                     return format_pattern;
                 };
 
@@ -79,14 +76,13 @@ namespace Demo {
                 void set_spdlog_pattern();
                 void set_spdlog_level();
             private:
-                std::shared_ptr<spdlog::logger> _logger;
-                std::shared_ptr<spdlog::logger> _logger_file;
+                std::weak_ptr<spdlog::logger> _logger;
                 std::string logger_name;
                 std::string logger_file_name;
                 int logger_level;
                 std::string format_pattern = "[%@] [%!] %^[%l]%$: %v";
                 std::string logger_dir_dsn = "logs";
-                std::string logger_dsn;
+                std::string logger_file_dsn;
                 unsigned int max_size;
                 unsigned int max_files;
     };

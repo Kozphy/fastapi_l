@@ -132,6 +132,7 @@ dmypy.json
 
 # config
 *.yaml
+!backup_*
 token
 
 # log
@@ -196,3 +197,7 @@ docker_token
 
 # testcpp
 testcpp/logs
+
+# protobuf
+*.proto
+!backup_*.proto
