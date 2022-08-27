@@ -13,5 +13,5 @@ add_library(Demo::protobuf_config ALIAS protobuf_config)
 
 target_link_libraries(protobuf_config
     PUBLIC
-    ${PROTOBUF_LIBRARIES} 
+    protobuf::protobuf
 )

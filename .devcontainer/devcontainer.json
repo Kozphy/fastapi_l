@@ -39,7 +39,8 @@
 				"ms-python.black-formatter",
 				"twxs.cmake",
 				"ms-vscode.cmake-tools",
-				"ms-vscode.cpptools-extension-pack"
+				"ms-vscode.cpptools-extension-pack",
+				"zxh404.vscode-proto3"
 			]
 		}
 	}

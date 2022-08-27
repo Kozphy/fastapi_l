@@ -32,9 +32,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # message("List of compile features: ${CMAKE_CXX_COMPILE_FEATURES}")
 # target_compile_options(${PROJECT_NAME} PRIVATE -fmodules-ts)
 
-
-
-include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+# where is conan install folder
+include(${CMAKE_BINARY_DIR}/cmake-build-release/conan_paths.cmake)
 
 # third party library
 find_package(Boost REQUIRED)
@@ -50,6 +49,7 @@ configure_file(datacpp/BasicConfig.h.in BasicConfig.h)
 # add subdirectories
 add_subdirectory(${PROJECT_SOURCE_DIR}/datacpp)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/Logger)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/configuration)
 
 
 if(SKBUILD)

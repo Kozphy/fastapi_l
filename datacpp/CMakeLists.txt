@@ -3,9 +3,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
 )
 
-
 target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger)
-target_link_libraries(${PROJECT_NAME} PRIVATE Demo::protobuf_config)
 
 
 # third party library
@@ -40,9 +38,8 @@ else()
 endif()
 
 if(TARGET protobuf::protobuf)
-  # target_link_libraries(${PROJECT_NAME} PRIVATE protobuf::protobuf)
-  message ("protobuf found")
-  add_subdirectory(configuration)
+  message("protobuf found")
+  target_link_libraries(${PROJECT_NAME} PRIVATE Demo::protobuf_config)
 else()
   message(FATAL_message "protobuf not found")
 endif()
@@ -77,6 +74,9 @@ if(TARGET cppcheck::cppcheck)
       "--cppcheck-build-dir=${CPPCHECK_BUILD_RESULT}"
       # unwant in release
       "-i ${CMAKE_CURRENT_SOURCE_DIR}/training"
+      # TODO: fix checking config.pb.cc warning
+      "-i ${CMAKE_CURRENT_SOURCE_DIR}/configuration"
+      "-i ${CMAKE_BINARY_DIR}"
   )
 
   message("Path: ${CPPCHECK}")
