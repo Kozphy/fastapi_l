@@ -1,3 +1,18 @@
-// the configured options and settings for Tutorial
-#define Demo_VERSION_MAJOR @fastapi_demo_with_cmake_VERSION_MAJOR@
-#define Demo_VERSION_MINOR @fastapi_demo_with_cmake_VERSION_MINOR@
+#ifndef __BASIC_CONFIG_H__
+#define __BASIC_CONFIG_H__
+#include <string_view>
+
+// VERSION
+// #define  Demo_VERSION_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@
+// #define Demo_VERSION_MINOR @CMAKE_PROJECT_VERSION_MINOR@
+constexpr int  Demo_VERSION_MAJOR = @CMAKE_PROJECT_VERSION_MAJOR@;
+constexpr float Demo_VERSION_MINOR = @CMAKE_PROJECT_VERSION_MINOR@;
+
+// TODO: properly define
+// config destination
+constexpr std::string_view Demo_DEFAULT_YAML_DSN = "${PROJECT_SOURCE_DIR}/datacpp/configuration/config.yaml";
+constexpr std::string_view Demo_DEFAULT_dir_name = "datacpp"
+constexpr std::string_view Demo_DEFAULT_config_dir_name = "configuration"
+constexpr std::string_view Demo_DEFAULT_YAML_NAME = "config.yaml";
+
+#endif

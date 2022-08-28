@@ -40,7 +40,8 @@
 				"twxs.cmake",
 				"ms-vscode.cmake-tools",
 				"ms-vscode.cpptools-extension-pack",
-				"zxh404.vscode-proto3"
+				"zxh404.vscode-proto3",
+				"xaver.clang-format"
 			]
 		}
 	}
