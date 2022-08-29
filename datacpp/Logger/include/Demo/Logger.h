@@ -1,5 +1,8 @@
 #ifndef Demo_Logger_INCLUDE
 #define Demo_Logger_INCLUDE
+// if not define SPDLOG_LEVEL_DEBUG, all DEBUG/TRACE statements will be removed by the pre-processor.
+// default SPDLOG_LEVEL is INFO.
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG 
 
 #include <iostream>
 #include <string_view>
@@ -14,13 +17,22 @@
 
 
 namespace Demo {
+    enum class Level {
+        TRACE = 0,
+        DEBUG = 1,
+        INFO = 2,
+        WARN = 3,
+        ERROR = 4,
+        CRITICAL = 5,
+        OFF = 6
+    };
 
     class logger_setting 
     {
             friend std::ostream &operator<<(std::ostream &os, const logger_setting &c);
             public:
                 explicit logger_setting(std::string logger_name, 
-                                        int logger_level = 0,
+                                        Level logger_level = Level::INFO,
                                         unsigned int max_size = 1024 * 1024 * 5, 
                                         unsigned int max_files = 3);
                 // ~logger_setting();
@@ -33,7 +45,7 @@ namespace Demo {
                     set_spdlog_pattern();
                 };
 
-                inline void set_level(const int &level)
+                inline void set_level(const Level &level)
                 {
                     this -> logger_level = level;
                     set_spdlog_level();
@@ -56,7 +68,7 @@ namespace Demo {
                     return logger_name;
                 };
 
-                inline int get_logger_level() const {
+                inline Level get_logger_level() const {
                     return logger_level;
                 }
 
@@ -79,7 +91,7 @@ namespace Demo {
                 std::weak_ptr<spdlog::logger> _logger;
                 std::string logger_name;
                 std::string logger_file_name;
-                int logger_level;
+                Level logger_level = Level::INFO;
                 std::string format_pattern = "[%@] [%!] %^[%l]%$: %v";
                 std::string logger_dir_dsn = "logs";
                 std::string logger_file_dsn;

@@ -2,6 +2,10 @@
 #define __BASIC_CONFIG_H__
 #include <string_view>
 
+// workspace and project
+constexpr std::string_view WORKSPACE_DIR = "${PROJECT_SOURCE_DIR}";
+constexpr std::string_view PROJECT_DIR_NAME = "datacpp";
+
 // VERSION
 // #define  Demo_VERSION_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@
 // #define Demo_VERSION_MINOR @CMAKE_PROJECT_VERSION_MINOR@
@@ -10,9 +14,7 @@ constexpr float Demo_VERSION_MINOR = @CMAKE_PROJECT_VERSION_MINOR@;
 
 // TODO: properly define
 // config destination
-constexpr std::string_view Demo_DEFAULT_YAML_DSN = "${PROJECT_SOURCE_DIR}/datacpp/configuration/config.yaml";
-constexpr std::string_view Demo_DEFAULT_dir_name = "datacpp"
-constexpr std::string_view Demo_DEFAULT_config_dir_name = "configuration"
+constexpr std::string_view Demo_DEFAULT_CONFIG_DIR_NAME = "configuration";
 constexpr std::string_view Demo_DEFAULT_YAML_NAME = "config.yaml";
 
 #endif

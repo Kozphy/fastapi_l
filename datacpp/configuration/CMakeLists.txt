@@ -1,3 +1,19 @@
+# configure 
+add_library(Configure STATIC 
+"src/Configure.cpp")
+
+add_library(Demo::Configure ALIAS Configure)
+
+target_link_libraries(Configure PRIVATE 
+Boost::filesystem fmt::fmt spdlog::spdlog Demo::Logger 
+)
+
+target_include_directories(Configure
+    PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+# protobuf_config
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS config.proto) 
 
 # Print path to generated files

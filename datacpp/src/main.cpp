@@ -10,6 +10,7 @@
 // Demo
 #include "BasicConfig.h"
 #include "Demo/Logger.h"
+#include "Demo/Configure.h"
 // #include "datacpp/configuration/config.pb.h"
 // Poco
 #include "Poco/Data/Session.h"
@@ -34,6 +35,7 @@ using Poco::Data::Statement;
 using Poco::Data::DataException;
 // demo
 using Demo::logger_setting;
+using Demo::Configure;
 // boost
 using boost::shared_ptr;
 using boost::make_shared;
@@ -62,11 +64,12 @@ int main(int argc, const char* argv[])
 
     try 
     {
-        auto pLogger1 = boost::make_shared<logger_setting>("test", 0);
-        // std::cout << *pLogger1 << std::endl;
+        auto pLogger1 = boost::make_shared<logger_setting>("test", Demo::Level::INFO);
+        pLogger1 -> set_level(Demo::Level::DEBUG);
 
         SPDLOG_INFO("start search config file");
-        path config_path(static_cast<string>(Demo_DEFAULT_YAML_DSN));
+        auto p_config = boost::make_shared<Configure>();
+        // path config_path();
         // if(exists(config_path)){
         //     if(is_regular_file(config_path))
         //         cout << config_path << " size is: " << file_size(config_path) << "\n";
@@ -95,16 +98,16 @@ int main(int argc, const char* argv[])
         // }
         cout << "current path: " << current_path() << endl;
 
-        SPDLOG_INFO("start session");
-        if(exists(config_path)){
-            YAML::Node config = YAML::LoadFile(config_path.string());
-            if(config["persistence"]["db"]){
-                std::cout << "db: " << config["persistence"]["db"].as<string>() << std::endl;;
-            }
-        }
-        string db_setting = "host=localhost;port=5432;db=test;user=zixas";
-        Poco::Data::PostgreSQL::Connector::registerConnector();
-        Session session(db_setting);
+        // SPDLOG_INFO("start session");
+        // if(exists(config_path)){
+        //     YAML::Node config = YAML::LoadFile(config_path.string());
+        //     if(config["persistence"]["db"]){
+        //         std::cout << "db: " << config["persistence"]["db"].as<string>() << std::endl;;
+        //     }
+        // }
+        // string db_setting = "host=localhost;port=5432;db=test;user=zixas";
+        // Poco::Data::PostgreSQL::Connector::registerConnector();
+        // Session session(db_setting);
     }
 
     catch(DataException &e)

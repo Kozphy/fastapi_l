@@ -3,7 +3,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger)
+target_link_libraries(${PROJECT_NAME} PRIVATE Demo::Logger Demo::Configure)
 
 
 # third party library

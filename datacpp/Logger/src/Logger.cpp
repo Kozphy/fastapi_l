@@ -17,7 +17,7 @@ namespace Demo {
     ostream &operator<<(ostream &os, const logger_setting &c)
     {
         os << "{\n" << "\tlogger name: " << c.get_logger_name() << "," << "\n"
-        << "\tlogger level: " << c.get_logger_level() << "," << "\n"
+        << "\tlogger level: " << static_cast<int>(c.get_logger_level()) << "," << "\n"
         <<"\tlogger pattern: " << c.get_pattern()<< "," << "\n"
         << "\tlogger file size: " << c.get_max_size() << "," << "\n"
         << "\tlogger max files: " << c.get_max_files() << "\n}";
@@ -25,7 +25,7 @@ namespace Demo {
         return os;
     }
     
-    logger_setting::logger_setting(string logger_name, int logger_level, unsigned int max_size , unsigned int max_files)
+    logger_setting::logger_setting(string logger_name, Level logger_level, unsigned int max_size , unsigned int max_files)
     {
         try
         {
@@ -87,14 +87,14 @@ namespace Demo {
             #define SPDLOG_LEVEL_OFF 6
         */
         switch(this -> logger_level){
-            case 0:
+            case Level::INFO:
                 SPDLOG_INFO("verbose level set to info");
                 break;
-            case 1:
+            case Level::DEBUG:
                 spdlog_level = spdlog::level::debug;
                 SPDLOG_INFO("verbose level set to debug");
                 break;
-            case 2:
+            case Level::TRACE:
                 spdlog_level = spdlog::level::trace;
                 SPDLOG_INFO("verbose level set to trace");
                 break;

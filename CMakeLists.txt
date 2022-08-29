@@ -45,6 +45,7 @@ find_package("yaml-cpp")
 find_package(Protobuf REQUIRED)
 
 configure_file(datacpp/BasicConfig.h.in BasicConfig.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
 # Allow enabling and disabling components
@@ -53,9 +54,9 @@ option(ENABLE_PROTOBUF_CONFIG "Enable Protobuf for configuration" OFF)
 # add subdirectories
 add_subdirectory(${PROJECT_SOURCE_DIR}/datacpp)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/Logger)
-if(ENABLE_PROTOBUF_CONFIG)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/configuration)
-endif()
+# if(ENABLE_PROTOBUF_CONFIG)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/datacpp/configuration)
+# endif()
 
 
 if(SKBUILD)
