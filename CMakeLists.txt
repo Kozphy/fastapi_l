@@ -33,7 +33,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # target_compile_options(${PROJECT_NAME} PRIVATE -fmodules-ts)
 
 # where is conan install folder
-include(${CMAKE_BINARY_DIR}/cmake-build-release/conan_paths.cmake)
+# include(${CMAKE_BINARY_DIR}/cmake-build-release/conan_paths.cmake)
+
+## build tool option
+option(ENABLE_SKBUILD "Enable skbuild" ON)
 
 # third party library
 find_package(Boost REQUIRED)
@@ -44,6 +47,16 @@ find_package(cppcheck)
 find_package("yaml-cpp")
 find_package(Protobuf REQUIRED)
 
+## skbuild
+## TODO: reseach how to combine conan skbuild cmake
+if(ENABLE_SKBUILD)
+  find_package(PythonExtensions REQUIRED)
+  add_library(${PROJECT_NAME} MODULE datacpp/src/main.cpp)
+  python_extension_module("${PROJECT_NAME}")
+  install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION test)
+endif()
+
+## configure
 configure_file(datacpp/BasicConfig.h.in BasicConfig.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

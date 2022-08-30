@@ -102,6 +102,7 @@ robotframework-pythonlibcore==3.0.0
 robotframework-requests==0.9.3
 robotframework-seleniumlibrary==6.0.0
 rsa==4.8
+scikit-build==0.15.0
 SecretStorage==3.3.1
 selenium==4.2.0
 six==1.16.0

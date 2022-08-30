@@ -1,4 +1,9 @@
-add_executable(${PROJECT_NAME} src/main.cpp)
+## TODO: reseach how to combine conan skbuild cmake
+# build with conan
+if(!ENABLE_SKBUILD)
+  add_executable(${PROJECT_NAME} src/main.cpp)
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
 )

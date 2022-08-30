@@ -3,7 +3,6 @@ from configuration.api_service_config.config_fastapi import settings
 from copy import deepcopy
 import redis as sync_redis
 from aioredis import Redis as async_redis
-from persistences.redis.connection import Redis_connect
 from attrs import define
 
 
