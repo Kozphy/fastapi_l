@@ -9,7 +9,7 @@ from sqlalchemy.engine import Connection, CursorResult
 from sqlalchemy import select, insert, delete
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.pydantic.vote import Vote
+from routers.dependency.pydantic.pyd_vote import Vote
 from routers.dependency.security import oauth2
 
 router = APIRouter(prefix="/vote", tags=["Vote"])

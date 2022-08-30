@@ -4,8 +4,6 @@ import json
 from aioredis import Redis
 from celery_app.pickling import save
 import asyncio
-import pickle
-import cloudpickle
 
 
 def data_to_redis_cache(cache_data, key):

@@ -41,9 +41,12 @@ class User_login(User_base):
     pass
 
 
+# TODO: one of email phone and username value must exist
 class User_response(BaseModel):
     id: int
-    email: EmailStr
+    email: Union[EmailStr, Literal[""]]
+    phone: Optional[int]
+    username: Optional[str]
     created_at: datetime
 
     class Config:

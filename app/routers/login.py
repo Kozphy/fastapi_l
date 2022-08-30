@@ -12,7 +12,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy import text, select, literal_column, insert, delete, update
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.pydantic.auth import Token
+from routers.dependency.pydantic.pyd_auth import Token
 from routers.dependency.security.oauth2 import create_access_token
 
 router = APIRouter(tags=["Authentication"])

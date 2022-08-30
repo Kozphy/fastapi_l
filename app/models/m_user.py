@@ -28,6 +28,8 @@ class Node_value:
 
 def check_whether_input_account(user):
     sum_none = 0
+    ## if account input exist, following value will equal input value and
+    ## if account input not exist, sum_none will increase 1.
     account_input_exist = {
         "email": False,
         "phone": False,
@@ -64,13 +66,24 @@ def check_account_exist(user, account_input_exist: dict, sqldb: Connection):
     return check_account
 
 
+def insert_to_table(data, table, returning, sqldb: Connection):
+    if returning is None:
+        stmt_insert = insert(table).values(**data)
+        sqldb.execute(stmt_insert)
+    else:
+        stmt_insert = insert(table).values(**data).returning(*returning)
+        table_return = sqldb.execute(stmt_insert).first()._asdict()
+
+    return table_return
+
+
 # TODO: phone number convert to comply database format
 def user_to_sqldb(user, sqldb: Connection):
     logger.info("user data to sqldb")
     logger.debug(user)
     user = user.dict()
     try:
-        # password check
+        # password check whether equal
         if user["password"] != user["password_check"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -95,8 +108,9 @@ def user_to_sqldb(user, sqldb: Connection):
     user["password"] = hash_password
 
     logger.debug(f"Now user with password: {user}")
+
+    # construct what data want to insert to database table
     try:
-        ## TODO: insert value to table
         stmt_insert_t_v = {
             users_outline.users_table: {
                 "surname": user["surname"],
@@ -105,32 +119,17 @@ def user_to_sqldb(user, sqldb: Connection):
                 "description": user["description"],
             },
             users_registration.users_register_table: {},
-            # users_country.users_country_table: {
-            #     "country": user["country"],
-            #     "country_code": user["country_code"],
-            # },
-            # users_id_card_in_formosa.users_id_card_in_formosa_table: {
-            #     "gender": user["gender"],
-            #     "formosa_id_card_letter": user["id_card"][0],
-            #     "formosa_id_card": user["id_card"][1:],
-            #     "subscriber_number": user["subscriber_number"],
-            # },
-            # users_address.users_address_table: {
-            #     "city": user["city"],
-            #     "region": user["region"],
-            #     "address1": user["address1"],
-            #     "address2": user["address2"],
-            #     "address3": user["address3"],
-            #     "zip_code": user["zip_code"],
-            # },
         }
 
+        # what values do you want to return from database
         stmt_insert_t_r = {
-            users_outline.users_table: [users_outline.users_table.c.id],
-            # users_registration.users_register_table: [
-            #     users_registration.users_register_table.c.registration,
-            #     users_registration.users_register_table.c.registration_type,
-            # ],
+            users_outline.users_table: [
+                users_outline.users_table.c.id,
+            ],
+            users_registration.users_register_table: [
+                users_registration.users_register_table.c.registration,
+                users_registration.users_register_table.c.registration_type,
+            ],
         }
 
         sql_return_data = {}
@@ -144,18 +143,19 @@ def user_to_sqldb(user, sqldb: Connection):
                         "registration_type": Register[account],
                     }
                 )
-                sql_return_data.update({account: user[account]})
+    except Exception as e:
+        logger.error(e)
+        raise e
 
-        # execute sql stmt
+    # execute sql stmt
+    try:
         for table, value in stmt_insert_t_v.items():
             returning_check = stmt_insert_t_r.get(table, None)
-            if returning_check is not None:
-                stmt_insert = insert(table).values(**value).returning(*returning_check)
-                table_return = sqldb.execute(stmt_insert).first()._asdict()
-                sql_return_data.update(**table_return)
-            else:
-                stmt_insert = insert(table).values(**value)
-                sqldb.execute(stmt_insert)
+            # if returning_check is not None:
+            table_return = insert_to_table(value, table, returning_check, sqldb)
+            logger.debug(f"table_name: {table.name}")
+            logger.debug(f"table_return: {table_return}")
+            sql_return_data.update({table.name: table_return})
 
             if table == users_outline.users_table:
                 logger.debug(f"users_table return is : {table_return}")
@@ -163,10 +163,10 @@ def user_to_sqldb(user, sqldb: Connection):
                     {"user_id": table_return["id"]}
                 )
 
+        logger.debug(f"sql_return_data is: {sql_return_data}")
     except Exception as e:
         logger.error(e)
         raise e
-    logger.debug(f"sql_return_data is: {sql_return_data}")
     return sql_return_data
 
 

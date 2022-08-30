@@ -8,13 +8,13 @@ from persistences.postgresql.modules.user.users_outline import (
 )
 
 from routers.dependency.database.sqlalchemy_db import get_db
-from routers.dependency.pydantic.user import (
+from routers.dependency.pydantic.pyd_user import (
     User_create,
     User_response,
 )
 from routers.dependency.security import oauth2
 
-from models.user import user_to_sqldb, account_to_proper_sqldb_table
+from models.m_user import user_to_sqldb, account_to_proper_sqldb_table
 
 router = APIRouter(
     prefix="/users",
@@ -31,6 +31,7 @@ def create_users(
     db: Connection = Depends(get_db),
 ):
     logger.info("create user")
+    # TODO: complete
     sql_return_data = user_to_sqldb(user, db)
     # background_tasks.add_task(account_to_proper_sqldb_table, sql_return_data, db)
 

@@ -1,5 +1,5 @@
 from requests import post
-from routers.dependency.pydantic.post import (
+from routers.dependency.pydantic.pyd_post import (
     Post_create,
     Post_update,
     Post_response,

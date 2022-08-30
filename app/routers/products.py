@@ -8,7 +8,7 @@ from fastapi import (
     BackgroundTasks,
 )
 
-from routers.dependency.pydantic.products import Product
+from routers.dependency.pydantic.pyd_products import Product
 
 # from routers.dependency.database.redis import get_redis
 from routers.dependency.security import oauth2

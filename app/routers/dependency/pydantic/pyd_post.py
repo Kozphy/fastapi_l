@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Dict, Union
 
-from .user import User_response
+from .pyd_user import User_response
 
 
 class Post_base(BaseModel):
