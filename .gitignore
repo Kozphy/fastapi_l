@@ -171,4 +171,8 @@ testrun/*
 .~lock*
 *.pkl
 
+# docker_token
+docker_token
 
+# datacpp
+datacpp
