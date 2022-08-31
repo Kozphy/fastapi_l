@@ -42,7 +42,7 @@ users_register_table = Table(
     ),
     Column("registration_type", register_enum, nullable=False),
     Column(
-        "create_at",
+        "created_at",
         TIMESTAMP(timezone=True),
         nullable=False,
         server_default=text("now()"),

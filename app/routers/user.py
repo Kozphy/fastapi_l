@@ -11,6 +11,7 @@ from routers.dependency.database.sqlalchemy_db import get_db
 from routers.dependency.pydantic.pyd_user import (
     User_create,
     User_response,
+    User_create_response,
 )
 from routers.dependency.security import oauth2
 
@@ -24,7 +25,12 @@ router = APIRouter(
 from loguru import logger
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=User_response)
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=User_create_response,
+    response_model_exclude_unset=True,
+)
 def create_users(
     user: User_create,
     background_tasks: BackgroundTasks,
@@ -32,18 +38,20 @@ def create_users(
 ):
     logger.info("create user")
     # TODO: complete
-    sql_return_data = user_to_sqldb(user, db)
-    # background_tasks.add_task(account_to_proper_sqldb_table, sql_return_data, db)
+    account = user_to_sqldb(user, db)
+    background_tasks.add_task(account_to_proper_sqldb_table, account, db)
 
     db.commit()
     # print(result)
 
-    # user_title = ["id", "email", "password", "created_at"]
-    # res = {}
-    # for i, title in enumerate(user_title):
-    #     res.update({title: result[i]})
+    res_title = ["registration", "created_at"]
+    res = {}
+    for title in res_title:
+        logger.debug(account["users_register"][title])
+        res.update({title: account["users_register"][title]})
 
-    # return res
+    logger.debug(res)
+    return res
 
 
 @router.get("/{id}", response_model=User_response)

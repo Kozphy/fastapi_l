@@ -4,9 +4,9 @@ from typing import Optional, Union, Literal
 
 # request validate
 class User_base(BaseModel):
-    email: Union[EmailStr, Literal[""]]
-    phone: Optional[str]
-    username: Optional[str]
+    email: Union[EmailStr, Literal[""], None] = None
+    phone: Optional[str] = None
+    username: Optional[str] = None
     password: str
 
 
@@ -41,12 +41,20 @@ class User_login(User_base):
     pass
 
 
+class User_create_response(BaseModel):
+    registration: Union[str, EmailStr]
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
 # TODO: one of email phone and username value must exist
+# Optional email
 class User_response(BaseModel):
-    id: int
-    email: Union[EmailStr, Literal[""]]
-    phone: Optional[int]
-    username: Optional[str]
+    email: Union[EmailStr, Literal[""], None] = None
+    phone: Optional[int] = None
+    username: Optional[str] = None
     created_at: datetime
 
     class Config:

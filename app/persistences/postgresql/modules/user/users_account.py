@@ -31,7 +31,7 @@ users_username_table = Table(
         nullable=False,
     ),
     Column("username", VARCHAR(255), nullable=False, unique=True),
-    Column("create_at", TIMESTAMP(timezone=True), server_default=text("now()")),
+    Column("created_at", TIMESTAMP(timezone=True), server_default=text("now()")),
     Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
 )
 
@@ -52,7 +52,7 @@ users_email_table = Table(
         nullable=False,
     ),
     Column("email", VARCHAR(255), nullable=False, unique=True),
-    Column("create_at", TIMESTAMP(timezone=True), server_default=text("now()")),
+    Column("created_at", TIMESTAMP(timezone=True), server_default=text("now()")),
     Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
 )
 
@@ -78,7 +78,7 @@ users_phone_table = Table(
         nullable=False,
     ),
     Column("subscriber_number", VARCHAR(15), nullable=False),
-    Column("create_at", TIMESTAMP(timezone=True), server_default=text("now()")),
+    Column("created_at", TIMESTAMP(timezone=True), server_default=text("now()")),
     Column("last_update", TIMESTAMP(timezone=True), server_default=text("now()")),
     UniqueConstraint("user_country_id", "subscriber_number"),
 )

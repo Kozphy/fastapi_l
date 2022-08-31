@@ -1,7 +1,12 @@
 from fastapi import HTTPException, status
+from loguru import logger
+from attrs import define
+from typing import Any
+import phonenumbers
 
 from sqlalchemy import select, insert, or_
 from sqlalchemy.engine import Connection
+from sqlalchemy.schema import Table
 
 from persistences.postgresql.modules.user import (
     users_account,
@@ -13,17 +18,15 @@ from persistences.postgresql.modules.user import (
     users_status,
 )
 from enums.register import Register
+from enums.country_code import CountryCode
 from routers.dependency.security import utils
-from loguru import logger
-
-from attrs import define
-from typing import Any
 
 
-@define
-class Node_value:
-    data: list[str, Any]
-    stmt: tuple[Any]
+
+# @define
+# class Node_value:
+#     data: list[str, Any]
+#     stmt: tuple[Any]
 
 
 def check_whether_input_account(user):
@@ -67,6 +70,7 @@ def check_account_exist(user, account_input_exist: dict, sqldb: Connection):
 
 
 def insert_to_table(data, table, returning, sqldb: Connection):
+    logger.debug(f"data: {data}, table: {table}, returning: {returning}")
     if returning is None:
         stmt_insert = insert(table).values(**data)
         sqldb.execute(stmt_insert)
@@ -107,7 +111,7 @@ def user_to_sqldb(user, sqldb: Connection):
     hash_password = utils.hash(user["password"])
     user["password"] = hash_password
 
-    logger.debug(f"Now user with password: {user}")
+    logger.debug(f"Now account with password: {user}")
 
     # construct what data want to insert to database table
     try:
@@ -129,6 +133,7 @@ def user_to_sqldb(user, sqldb: Connection):
             users_registration.users_register_table: [
                 users_registration.users_register_table.c.registration,
                 users_registration.users_register_table.c.registration_type,
+                users_registration.users_register_table.c.created_at,
             ],
         }
 
@@ -153,12 +158,10 @@ def user_to_sqldb(user, sqldb: Connection):
             returning_check = stmt_insert_t_r.get(table, None)
             # if returning_check is not None:
             table_return = insert_to_table(value, table, returning_check, sqldb)
-            logger.debug(f"table_name: {table.name}")
-            logger.debug(f"table_return: {table_return}")
+            logger.debug(f"table_return: {table.name}: {table_return}")
             sql_return_data.update({table.name: table_return})
 
             if table == users_outline.users_table:
-                logger.debug(f"users_table return is : {table_return}")
                 stmt_insert_t_v[users_registration.users_register_table].update(
                     {"user_id": table_return["id"]}
                 )
@@ -170,50 +173,102 @@ def user_to_sqldb(user, sqldb: Connection):
     return sql_return_data
 
 
-def account_to_proper_sqldb_table(sql_return_data: dict, sqldb: Connection):
+def construct_phone_table_stmt(stmt_insert_t_v: dict[Table, Any]):
+    """
+    Args:
+        stmt_insert_t_v (dict):
+            user_id: str = "0"
+            user_country_id: str = "0"
+            subscriber_number: str = "9688296572"
+    """
+    pass
+
+
+def contruct_username_table_stmt(stmt_insert_t_v: dict[Table, Any]):
     """
 
     Args:
-        sql_return_data (dict): {"id": 1, "email": 123@gmail.com}
+        stmt_insert_t_v (dict[Table, Any]): {
+            user_id: str = "0"
+            username: str = "xxxx"
+        }
+        sqldb (Connection): _description_
+    """
+    pass
+
+
+def construct_email_table_stmt(stmt_insert_t_v: dict[Table, Any]):
+    """
+    Args:
+        stmt_insert_t_v (dict[Table, Any]): {
+            user_id: str = "0"
+            email: str = "xxx@gmail.com"
+        }
+    """
+    pass
+
+
+def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
+    """
+    Args:
+        account (dict[str, Any]):  {
+            users: {'id': 12},
+            users_register: {'registration': '0961300141', 'registration_type': <Register.phone: 2>
+        }
         sqldb (Connection): _description_
 
     Raises:
         e: _description_
     """
     try:
+        # construct what data want to insert to database table
         table_map = {
-            "email": users_account.users_email_table,
-            "mobile": users_account.users_phone_table,
-            "username": users_account.users_username_table,
+            Register["username"]: users_account.users_username_table,
+            Register["email"]: users_account.users_email_table,
+            Register["phone"]: users_account.users_phone_table,
         }
-        stmt_insert_t_v = {}
+        regis_type = account["users_register"]["registration_type"]
+        stmt_insert_t_v = {
+            table_map[regis_type]: {
+                "user_id": account["users"]["id"],
+            }
+        }
+
+        if regis_type == Register["username"]:
+            contruct_username_table_stmt()
+        elif regis_type == Register["email"]:
+            construct_email_table_stmt()
+        elif regis_type == Register["phone"]:
+            x = phonenumbers.parse(account["users_register"]["registration"])
+            logger.debug(f"phone country: {x}")
+            stmt_insert_t_v = construct_phone_table_stmt(stmt_insert_t_v)
         # stmt_insert_t_r = {}
-        for key, value in sql_return_data.items():
-            if key in ["email", "username"]:
-                stmt_insert_t_v.update(
-                    {
-                        table_map[key]: {
-                            "user_id": sql_return_data["id"],
-                            key: value,
-                        }
-                    }
-                )
-            if key in ["mobile"]:
-                stmt_insert_t_v.update(
-                    {
-                        table_map[key]: {
-                            "user_id": sql_return_data["id"],
-                            "user_country_id": sql_return_data["user_country_id"],
-                            "subscriber_number": sql_return_data["subscriber_number"],
-                        }
-                    }
-                )
 
-        # execute sql stmt
-        for table, value in stmt_insert_t_v.items():
-            stmt_insert = insert(table).value(**value)
-            sqldb.execute(stmt_insert)
-
+        # for key, value in account.items():
+        #     if key in ["email", "username"]:
+        #         stmt_insert_t_v.update(
+        #             {
+        #                 table_map[key]: {
+        #                     "user_id": account["id"],
+        #                     key: value,
+        #                 }
+        #             }
+        #         )
+        #     if key in ["mobile"]:
+        #         stmt_insert_t_v.update(
+        #             {
+        #                 table_map[key]: {
+        #                     "user_id": account["id"],
+        #                     "user_country_id": account["user_country_id"],
+        #                     "subscriber_number": account["subscriber_number"],
+        #                 }
+        #             }
+        #         )
     except Exception as e:
         logger.error(e)
         raise e
+
+    # execute sql stmt
+    # for table, value in stmt_insert_t_v.items():
+    #     stmt_insert = insert(table).value(**value)
+    #     sqldb.execute(stmt_insert)

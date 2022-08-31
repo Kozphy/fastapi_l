@@ -133,7 +133,7 @@ def upgrade():
         #     nullable=False,
         # ),
         sa.Column(
-            "create_at",
+            "created_at",
             sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
@@ -211,7 +211,7 @@ def upgrade():
         sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("email", sa.VARCHAR(length=255), nullable=False),
         sa.Column(
-            "create_at",
+            "created_at",
             sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=True,
@@ -256,7 +256,7 @@ def upgrade():
         sa.Column("issuance_date", sa.TIMESTAMP(timezone=True), nullable=False),
         sa.Column("description", sa.TEXT(), nullable=True),
         sa.Column(
-            "create_at",
+            "created_at",
             sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
@@ -296,7 +296,7 @@ def upgrade():
         sa.Column("user_country_id", sa.BigInteger(), nullable=False),
         sa.Column("subscriber_number", sa.VARCHAR(length=15), nullable=False),
         sa.Column(
-            "create_at",
+            "created_at",
             sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=True,
@@ -331,7 +331,7 @@ def upgrade():
         sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("username", sa.VARCHAR(length=255), nullable=False),
         sa.Column(
-            "create_at",
+            "created_at",
             sa.TIMESTAMP(timezone=True),
             server_default=sa.text("now()"),
             nullable=True,

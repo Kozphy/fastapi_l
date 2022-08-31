@@ -45,7 +45,7 @@ users_id_card_in_formosa_table = Table(
     Column("issuance_date", TIMESTAMP(timezone=True), nullable=False),
     Column("description", TEXT()),
     Column(
-        "create_at",
+        "created_at",
         TIMESTAMP(timezone=True),
         nullable=False,
         server_default=text("now()"),
