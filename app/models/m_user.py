@@ -3,6 +3,8 @@ from loguru import logger
 from attrs import define
 from typing import Any
 import phonenumbers
+from phonenumbers import NumberParseException
+
 
 from sqlalchemy import select, insert, or_
 from sqlalchemy.engine import Connection
@@ -20,7 +22,6 @@ from persistences.postgresql.modules.user import (
 from enums.register import Register
 from enums.country_code import CountryCode
 from routers.dependency.security import utils
-
 
 
 # @define
@@ -87,13 +88,6 @@ def user_to_sqldb(user, sqldb: Connection):
     logger.debug(user)
     user = user.dict()
     try:
-        # password check whether equal
-        if user["password"] != user["password_check"]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="please check your password field value, \
-                whether same as password check field value.",
-            )
         del user["password_check"]
         user, account_input_exist = check_whether_input_account(user)
         check_account = check_account_exist(user, account_input_exist, sqldb)
@@ -179,7 +173,7 @@ def construct_phone_table_stmt(stmt_insert_t_v: dict[Table, Any]):
         stmt_insert_t_v (dict):
             user_id: str = "0"
             user_country_id: str = "0"
-            subscriber_number: str = "9688296572"
+            subscriber_number: str = "9189296212"
     """
     pass
 
@@ -241,6 +235,8 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
         elif regis_type == Register["phone"]:
             x = phonenumbers.parse(account["users_register"]["registration"])
             logger.debug(f"phone country: {x}")
+            # if not phonenumbers.is_valid_number(x):
+
             stmt_insert_t_v = construct_phone_table_stmt(stmt_insert_t_v)
         # stmt_insert_t_r = {}
 
@@ -264,6 +260,9 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
         #                 }
         #             }
         #         )
+    except NumberParseException as e:
+        logger.error(e)
+        raise e
     except Exception as e:
         logger.error(e)
         raise e
