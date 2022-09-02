@@ -40,7 +40,7 @@ def upgrade():
         ],
     )
     op.bulk_insert(
-        users_country_table, [{"id": 0, "country": "Taiwan", "country_code": "+886"}]
+        users_country_table, [{"id": 0, "country": "Formosa", "country_code": "+886"}]
     )
 
 

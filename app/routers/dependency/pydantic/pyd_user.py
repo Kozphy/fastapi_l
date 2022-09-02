@@ -1,31 +1,21 @@
-from pydantic import BaseModel, EmailStr, validator, ValidationError
+from models.m_user import check_account_exist
+from pydantic import BaseModel, EmailStr, validator, ValidationError, root_validator
 
 # from fastapi import HTTPException, status
 from datetime import datetime
 from typing import Optional, Union, Literal
 
 
-# class Error(BaseModel):
-#     code: int
-#     message: str
-
-
 # request validate
 class User_base(BaseModel):
-    # error: Error | None
     email: Union[EmailStr, Literal[""], None] = None
     phone: Optional[str] = None
     username: Optional[str] = None
     password: str
 
-    # @validator("error", always=True, check_fields=False)
-    # def check_consistency(cls, v, values):
-    #     if v is not None:
-    #         raise ValueError(v.message)
-
     @validator("phone")
     def phone_must_start_with_plus(cls, v):
-        if not v.startswith("+"):
+        if v is not None and v != "" and not v.startswith("+"):
             raise ValueError("phone must be E.164 format.")
         return v
 
@@ -36,7 +26,22 @@ class User_create(User_base):
     description: str
     password_check: str
 
-    @validator("password_check")
+    @root_validator(pre=True)
+    def check_account_exist(cls, values):
+        email, phone, username = (
+            values.get("email", None),
+            values.get("phone", None),
+            values.get("username", None),
+        )
+
+        if not (email or phone or username):
+            raise ValueError(
+                "please input one of email, phone and username value as your account."
+            )
+
+        return values
+
+    @validator("password_check", pre=True)
     def password_match(cls, v, values, **kwargs):
         if "password" in values and v != values["password"]:
             raise ValueError("password and password_check must be match.")

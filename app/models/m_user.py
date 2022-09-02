@@ -3,7 +3,7 @@ from loguru import logger
 from attrs import define
 from typing import Any
 import phonenumbers
-from phonenumbers import NumberParseException
+from phonenumbers import NumberParseException, geocoder
 
 
 from sqlalchemy import select, insert, or_
@@ -30,28 +30,32 @@ from routers.dependency.security import utils
 #     stmt: tuple[Any]
 
 
-def check_whether_input_account(user):
-    sum_none = 0
-    ## if account input exist, following value will equal input value and
-    ## if account input not exist, sum_none will increase 1.
+def filter_out_input_account(user: dict[str, Any]):
+    ## if account input exist, following value will equal input value.
     account_input_exist = {
-        "email": False,
-        "phone": False,
-        "username": False,
+        "email": user.get("email", None),
+        "phone": user.get("phone", None),
+        "username": user.get("username", None),
     }
-    for account in account_input_exist.keys():
-        if user[account] is None or user[account] == "":
-            sum_none += 1
-            del user[account]
-        else:
-            account_input_exist[account] = user[account]
 
-    if sum_none == 3:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="please input what account do you want.",
+    return dict(
+        filter(
+            lambda account: account[1] is not None and account[1] != "",
+            account_input_exist.items(),
         )
-    return user, account_input_exist
+    )
+    # account_input_exist = {
+    #     "email": False,
+    #     "phone": False,
+    #     "username": False,
+    # }
+    # for account in account_input_exist.keys():
+    #     if user[account] is None or user[account] == "":
+    #         continue
+    #     else:
+    #         account_input_exist[account] = user[account]
+
+    # return account_input_exist
 
 
 def check_account_exist(user, account_input_exist: dict, sqldb: Connection):
@@ -88,8 +92,7 @@ def user_to_sqldb(user, sqldb: Connection):
     logger.debug(user)
     user = user.dict()
     try:
-        del user["password_check"]
-        user, account_input_exist = check_whether_input_account(user)
+        account_input_exist = filter_out_input_account(user)
         check_account = check_account_exist(user, account_input_exist, sqldb)
     except Exception as e:
         logger.error(e)
@@ -109,7 +112,7 @@ def user_to_sqldb(user, sqldb: Connection):
 
     # construct what data want to insert to database table
     try:
-        stmt_insert_t_v = {
+        stmt_insert_t_v: dict[Table, dict] = {
             users_outline.users_table: {
                 "surname": user["surname"],
                 "password": user["password"],
@@ -120,7 +123,7 @@ def user_to_sqldb(user, sqldb: Connection):
         }
 
         # what values do you want to return from database
-        stmt_insert_t_r = {
+        stmt_insert_t_r: dict[Table, list] = {
             users_outline.users_table: [
                 users_outline.users_table.c.id,
             ],
@@ -215,6 +218,7 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
         e: _description_
     """
     try:
+        ## TODO: properly construct
         # construct what data want to insert to database table
         table_map = {
             Register["username"]: users_account.users_username_table,
@@ -234,7 +238,11 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
             construct_email_table_stmt()
         elif regis_type == Register["phone"]:
             x = phonenumbers.parse(account["users_register"]["registration"])
-            logger.debug(f"phone country: {x}")
+            logger.debug(f"phone parse obj: {x}")
+            logger.debug(f"phone country: {x.country_code}")
+            Region = geocoder.description_for_number(x, "en")
+            # if not hasattr(CountryCode, Region):
+
             # if not phonenumbers.is_valid_number(x):
 
             stmt_insert_t_v = construct_phone_table_stmt(stmt_insert_t_v)
