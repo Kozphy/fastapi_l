@@ -1,9 +1,12 @@
-from models.m_user import check_account_exist
 from pydantic import BaseModel, EmailStr, validator, ValidationError, root_validator
+import phonenumbers
+from phonenumbers import geocoder, NumberParseException, PhoneNumber
 
-# from fastapi import HTTPException, status
+from enums.country_code import CountryCode
+
 from datetime import datetime
 from typing import Optional, Union, Literal
+from loguru import logger
 
 
 # request validate
@@ -14,10 +17,45 @@ class User_base(BaseModel):
     password: str
 
     @validator("phone")
-    def phone_must_start_with_plus(cls, v):
-        if v is not None and v != "" and not v.startswith("+"):
+    def check_phone(cls, phone_v):
+        if phone_v is None or phone_v == "":
+            return phone_v
+
+        ## phone must start with plus
+        if not phone_v.startswith("+"):
             raise ValueError("phone must be E.164 format.")
-        return v
+
+        ## check phone country code
+        try:
+            ph_parse: PhoneNumber = phonenumbers.parse(phone_v)
+
+            ## check right digits
+            if not phonenumbers.is_possible_number(ph_parse):
+                raise ValueError("Phone number not possible.")
+
+            ## check It's in an assigned exchange
+            if not phonenumbers.is_valid_number(ph_parse):
+                raise ValueError("Phone number not valid.")
+
+            # Note: geocoder.description_for_number must be used after
+            # phone have passed is_possbile_number and is_valid_number validation process.
+            # otherwise region will return empty if user input phone is invalid number.
+            region: str = geocoder.description_for_number(ph_parse, "en")
+            if not hasattr(CountryCode, region):
+                raise ValueError(
+                    f"Currently, CountryCode: +{ph_parse.country_code}  not support in app"
+                )
+
+        except NumberParseException as e:
+            if e.error_type == NumberParseException.INVALID_COUNTRY_CODE:
+                raise ValueError(
+                    "The country code supplied did not belong to a supported country or non-geographical entity."
+                )
+            else:
+                logger.error(e)
+                raise ValueError(e)
+
+        return phone_v
 
 
 class User_create(User_base):

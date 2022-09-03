@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 from loguru import logger
 from attrs import define
-from typing import Any
+from typing import Any, Union
 import phonenumbers
-from phonenumbers import NumberParseException, geocoder
+from phonenumbers import NumberParseException, geocoder, PhoneNumber
 
 
 from sqlalchemy import select, insert, or_
@@ -28,6 +28,9 @@ from routers.dependency.security import utils
 # class Node_value:
 #     data: list[str, Any]
 #     stmt: tuple[Any]
+# @define
+# class Table_stmt:
+#     data: list[str, Any]
 
 
 def filter_out_input_account(user: dict[str, Any]):
@@ -74,7 +77,12 @@ def check_account_exist(user, account_input_exist: dict, sqldb: Connection):
     return check_account
 
 
-def insert_to_table(data, table, returning, sqldb: Connection):
+def insert_to_table(
+    data: dict[Any, Any],
+    table: Table,
+    sqldb: Connection,
+    returning: Union[None, list[Any]] = None,
+):
     logger.debug(f"data: {data}, table: {table}, returning: {returning}")
     if returning is None:
         stmt_insert = insert(table).values(**data)
@@ -154,7 +162,7 @@ def user_to_sqldb(user, sqldb: Connection):
         for table, value in stmt_insert_t_v.items():
             returning_check = stmt_insert_t_r.get(table, None)
             # if returning_check is not None:
-            table_return = insert_to_table(value, table, returning_check, sqldb)
+            table_return = insert_to_table(value, table, sqldb, returning_check)
             logger.debug(f"table_return: {table.name}: {table_return}")
             sql_return_data.update({table.name: table_return})
 
@@ -168,41 +176,6 @@ def user_to_sqldb(user, sqldb: Connection):
         logger.error(e)
         raise e
     return sql_return_data
-
-
-def construct_phone_table_stmt(stmt_insert_t_v: dict[Table, Any]):
-    """
-    Args:
-        stmt_insert_t_v (dict):
-            user_id: str = "0"
-            user_country_id: str = "0"
-            subscriber_number: str = "9189296212"
-    """
-    pass
-
-
-def contruct_username_table_stmt(stmt_insert_t_v: dict[Table, Any]):
-    """
-
-    Args:
-        stmt_insert_t_v (dict[Table, Any]): {
-            user_id: str = "0"
-            username: str = "xxxx"
-        }
-        sqldb (Connection): _description_
-    """
-    pass
-
-
-def construct_email_table_stmt(stmt_insert_t_v: dict[Table, Any]):
-    """
-    Args:
-        stmt_insert_t_v (dict[Table, Any]): {
-            user_id: str = "0"
-            email: str = "xxx@gmail.com"
-        }
-    """
-    pass
 
 
 def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
@@ -220,35 +193,60 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
     try:
         ## TODO: properly construct
         # construct what data want to insert to database table
-        table_map = {
-            Register["username"]: users_account.users_username_table,
-            Register["email"]: users_account.users_email_table,
-            Register["phone"]: users_account.users_phone_table,
+        logger.debug(f"account: {account}")
+        account_data: dict[str, Any] = {
+            **account["users"],
+            **account["users_register"],
         }
+        logger.debug(f"account_data: {account_data}")
+
         regis_type = account["users_register"]["registration_type"]
-        stmt_insert_t_v = {
-            table_map[regis_type]: {
-                "user_id": account["users"]["id"],
-            }
+        ph_parse: PhoneNumber = phonenumbers.parse(account_data["registration"])
+
+        ## TODO: correctly reflect user_country_id with phonenumbers country_code.
+        """relate to phone
+        Register["phone"]
+        ph_parse.country_code
+        geocoder.country_name_for_number
+        geocoder.description_for_number
+        """
+        stmt_insert_t_v: dict[str, Any] = {
+            "user_id": account_data["id"],
+            "user_country_id": ph_parse.country_code,
+            "subscriber_number": ph_parse.national_number,
+            "email": account_data["registration"],
+            "username": account_data["registration"],
         }
 
-        if regis_type == Register["username"]:
-            contruct_username_table_stmt()
+        filter_out_stmt_insert_t_v = {}
+
+        if regis_type == Register["phone"]:
+            phone_stmt_insert_t_v = dict(
+                filter(
+                    lambda x: x[0]
+                    in ["user_id", "user_country_id", "subscriber_number"],
+                    stmt_insert_t_v.items(),
+                )
+            )
+            filter_out_stmt_insert_t_v.update(**phone_stmt_insert_t_v)
         elif regis_type == Register["email"]:
-            construct_email_table_stmt()
-        elif regis_type == Register["phone"]:
-            x = phonenumbers.parse(account["users_register"]["registration"])
-            logger.debug(f"phone parse obj: {x}")
-            logger.debug(f"phone country: {x.country_code}")
-            Region = geocoder.description_for_number(x, "en")
-            # if not hasattr(CountryCode, Region):
+            email_stmt_insert_t_v = dict(
+                filter(
+                    lambda x: x[0] in ["user_id", "email"],
+                    stmt_insert_t_v.items(),
+                )
+            )
+            filter_out_stmt_insert_t_v.update(**email_stmt_insert_t_v)
+        elif regis_type == Register["username"]:
+            username_stmt_insert_t_v = dict(
+                filter(
+                    lambda x: x[0] in ["user_id", "username"],
+                    stmt_insert_t_v.items(),
+                )
+            )
+            filter_out_stmt_insert_t_v.update(**username_stmt_insert_t_v)
 
-            # if not phonenumbers.is_valid_number(x):
-
-            stmt_insert_t_v = construct_phone_table_stmt(stmt_insert_t_v)
-        # stmt_insert_t_r = {}
-
-        # for key, value in account.items():
+        # for key, value in account_data.items():
         #     if key in ["email", "username"]:
         #         stmt_insert_t_v.update(
         #             {
@@ -276,6 +274,20 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
         raise e
 
     # execute sql stmt
+    try:
+        table_map = {
+            Register["username"]: users_account.users_username_table,
+            Register["email"]: users_account.users_email_table,
+            Register["phone"]: users_account.users_phone_table,
+        }
+        insert_to_table(
+            filter_out_stmt_insert_t_v,
+            table_map[regis_type],
+            sqldb=sqldb,
+        )
+    except Exception as e:
+        logger.error(e)
+        raise e
     # for table, value in stmt_insert_t_v.items():
     #     stmt_insert = insert(table).value(**value)
     #     sqldb.execute(stmt_insert)
