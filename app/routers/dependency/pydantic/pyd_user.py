@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, validator, ValidationError, root_valid
 import phonenumbers
 from phonenumbers import geocoder, NumberParseException, PhoneNumber
 
-from enums.country_code import CountryCode
+from enums.country_code import CountryCodeId
 
 from datetime import datetime
 from typing import Optional, Union, Literal
@@ -28,7 +28,7 @@ class User_base(BaseModel):
         ## check phone country code
         try:
             ph_parse: PhoneNumber = phonenumbers.parse(phone_v)
-
+            ## TODO: fix phone number area code is not start at 09 in taiwan
             ## check right digits
             if not phonenumbers.is_possible_number(ph_parse):
                 raise ValueError("Phone number not possible.")
@@ -41,7 +41,7 @@ class User_base(BaseModel):
             # phone have passed is_possbile_number and is_valid_number validation process.
             # otherwise region will return empty if user input phone is invalid number.
             region: str = geocoder.description_for_number(ph_parse, "en")
-            if not hasattr(CountryCode, region):
+            if not hasattr(CountryCodeId, region):
                 raise ValueError(
                     f"Currently, CountryCode: +{ph_parse.country_code}  not support in app"
                 )

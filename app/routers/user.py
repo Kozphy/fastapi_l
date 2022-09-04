@@ -37,11 +37,9 @@ def create_users(
     db: Connection = Depends(get_db),
 ):
     logger.info("create user")
-    # TODO: complete
     account = user_to_sqldb(user, db)
     background_tasks.add_task(account_to_proper_sqldb_table, account, db)
 
-    db.commit()
     # print(result)
 
     res_title = ["registration", "created_at"]

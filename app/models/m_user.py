@@ -20,7 +20,7 @@ from persistences.postgresql.modules.user import (
     users_status,
 )
 from enums.register import Register
-from enums.country_code import CountryCode
+from enums.country_code import CountryCodeId
 from routers.dependency.security import utils
 
 
@@ -77,13 +77,14 @@ def check_account_exist(user, account_input_exist: dict, sqldb: Connection):
     return check_account
 
 
-def insert_to_table(
+def insert_to_db_table(
     data: dict[Any, Any],
     table: Table,
     sqldb: Connection,
     returning: Union[None, list[Any]] = None,
 ):
     logger.debug(f"data: {data}, table: {table}, returning: {returning}")
+    table_return = None
     if returning is None:
         stmt_insert = insert(table).values(**data)
         sqldb.execute(stmt_insert)
@@ -91,6 +92,7 @@ def insert_to_table(
         stmt_insert = insert(table).values(**data).returning(*returning)
         table_return = sqldb.execute(stmt_insert).first()._asdict()
 
+    sqldb.commit()
     return table_return
 
 
@@ -162,7 +164,7 @@ def user_to_sqldb(user, sqldb: Connection):
         for table, value in stmt_insert_t_v.items():
             returning_check = stmt_insert_t_r.get(table, None)
             # if returning_check is not None:
-            table_return = insert_to_table(value, table, sqldb, returning_check)
+            table_return = insert_to_db_table(value, table, sqldb, returning_check)
             logger.debug(f"table_return: {table.name}: {table_return}")
             sql_return_data.update({table.name: table_return})
 
@@ -202,17 +204,11 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
 
         regis_type = account["users_register"]["registration_type"]
         ph_parse: PhoneNumber = phonenumbers.parse(account_data["registration"])
+        country_name = geocoder.description_for_number(ph_parse, "en")
 
-        ## TODO: correctly reflect user_country_id with phonenumbers country_code.
-        """relate to phone
-        Register["phone"]
-        ph_parse.country_code
-        geocoder.country_name_for_number
-        geocoder.description_for_number
-        """
         stmt_insert_t_v: dict[str, Any] = {
             "user_id": account_data["id"],
-            "user_country_id": ph_parse.country_code,
+            "user_country_id": CountryCodeId[country_name].value,
             "subscriber_number": ph_parse.national_number,
             "email": account_data["registration"],
             "username": account_data["registration"],
@@ -280,7 +276,7 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
             Register["email"]: users_account.users_email_table,
             Register["phone"]: users_account.users_phone_table,
         }
-        insert_to_table(
+        insert_to_db_table(
             filter_out_stmt_insert_t_v,
             table_map[regis_type],
             sqldb=sqldb,
@@ -288,6 +284,3 @@ def account_to_proper_sqldb_table(account: dict[str, Any], sqldb: Connection):
     except Exception as e:
         logger.error(e)
         raise e
-    # for table, value in stmt_insert_t_v.items():
-    #     stmt_insert = insert(table).value(**value)
-    #     sqldb.execute(stmt_insert)
