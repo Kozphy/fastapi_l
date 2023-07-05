@@ -1,7 +1,11 @@
+
 # build app
 ```bash
 pip install -e .
 ```
+
+# before active serivce modefied backup_config.yaml in configuration/backup_config.yaml to your need
+
 
 # command
 ```bash
