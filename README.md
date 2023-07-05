@@ -4,7 +4,7 @@
 pip install -e .
 ```
 
-# before active serivce modefied backup_config.yaml in configuration/backup_config.yaml to your need
+# before active serivce modifying backup_config.yaml in configuration/backup_config.yaml to config.yaml
 
 
 # command
