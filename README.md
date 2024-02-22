@@ -1,7 +1,11 @@
+
 # build app
 ```bash
 pip install -e .
 ```
+
+# Before active serivce modifying backup_config.yaml in configuration/backup_config.yaml to config.yaml
+
 
 # command
 ```bash
